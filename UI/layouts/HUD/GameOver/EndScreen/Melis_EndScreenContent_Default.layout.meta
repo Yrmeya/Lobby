@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{91896B40F174D3C5}UI/layouts/HUD/GameOver/EndScreen/Melis_EndScreenContent_Default.layout"
+ Configurations {
+  LayoutResourceClass PC {
+  }
+  LayoutResourceClass XBOX_ONE : PC {
+  }
+  LayoutResourceClass XBOX_SERIES : PC {
+  }
+  LayoutResourceClass PS4 : PC {
+  }
+  LayoutResourceClass PS5 : PC {
+  }
+  LayoutResourceClass HEADLESS : PC {
+  }
+ }
+}

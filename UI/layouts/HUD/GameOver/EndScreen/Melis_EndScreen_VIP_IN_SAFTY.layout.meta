@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{99B9F37888882C91}UI/layouts/HUD/GameOver/EndScreen/Melis_EndScreen_VIP_IN_SAFTY.layout"
+ Configurations {
+  LayoutResourceClass PC {
+  }
+  LayoutResourceClass XBOX_ONE : PC {
+  }
+  LayoutResourceClass XBOX_SERIES : PC {
+  }
+  LayoutResourceClass PS4 : PC {
+  }
+  LayoutResourceClass PS5 : PC {
+  }
+  LayoutResourceClass HEADLESS : PC {
+  }
+ }
+}

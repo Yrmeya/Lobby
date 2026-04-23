@@ -1,0 +1,310 @@
+FrameWidgetClass {
+ Name "root"
+ Color 0 0 0 0
+ {
+  ImageWidgetClass "{68F937C13DFAEF7C}" {
+   Name "LobbyBackground"
+   Slot FrameWidgetSlot "{68F46DB5310ABB87}" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   Color 0.1208 0.0544 0.0493 1
+  }
+  TextWidgetClass "{68F937C13DFAEF73}" {
+   Name "LobbyTitle"
+   Slot FrameWidgetSlot "{68F46DB5310ABA4F}" {
+    Anchor 0 0 1 0
+    OffsetLeft 650
+    OffsetTop 54
+    OffsetRight 10.29
+    OffsetBottom -119
+   }
+   Color 1 1 1 1
+   Text "ЛОББИ — ВЫБОР РОЛИ"
+  }
+  TextWidgetClass "{68F937C13DF90806}" {
+   Name "LobbyStatus"
+   Slot FrameWidgetSlot "{68F46DB5310ABA68}" {
+    Anchor 0 0 1 0
+    OffsetLeft 650
+    OffsetTop 130
+    OffsetRight 11.614
+    OffsetBottom -170
+   }
+   Color 0.8 0.8 0.8 1
+   Text "Ожидание игроков..."
+  }
+  TextWidgetClass "{68F937C13DF90804}" {
+   Name "PlayerCount"
+   Slot FrameWidgetSlot "{68F46DB5310ABA7C}" {
+    Anchor 0 0 1 0
+    OffsetLeft 650
+    OffsetTop 175
+    OffsetRight 12.76
+    OffsetBottom -210
+   }
+   Color 0.7 0.7 0.7 1
+   Text "Игроков: 0"
+  }
+  TextWidgetClass "{68F937C13DF98C66}" {
+   Name "VoiceChatHint"
+   Slot FrameWidgetSlot "{68F46DB5310ABA1B}" {
+    Anchor 0 0 1 0
+    OffsetLeft 650
+    OffsetTop 210
+    OffsetRight 15.612
+    OffsetBottom -240
+   }
+   Color 0.5 0.8 0.5 1
+   Text "Голосовой чат активен — нажмите T для разговора"
+  }
+  TextWidgetClass "{68F937C13DF98C61}" {
+   Name "RolesHeader"
+   Slot FrameWidgetSlot "{68F46DB5310ABA2F}" {
+    Anchor 0 0 0 0
+    OffsetLeft 645
+    OffsetTop 240
+    OffsetRight -1105
+    OffsetBottom -270
+   }
+   Color 0.9 0.9 0.5 1
+   Text "РОЛИ"
+  }
+  TextWidgetClass "{68F937C13DF9C6AC}" {
+   Name "PlayersHeader"
+   Slot FrameWidgetSlot "{68F46DB5310ABA32}" {
+    Anchor 0.6 0 1 0
+    OffsetLeft -5
+    OffsetTop 240
+    OffsetRight 12.91
+    OffsetBottom -270
+   }
+   Color 0.9 0.9 0.5 1
+   Text "ИГРОКИ В ЛОББИ"
+  }
+  FrameWidgetClass "{68F937C13DF80438}" {
+   Name "RoleListContainer"
+   Slot FrameWidgetSlot "{68F46DB5310ABAC7}" {
+    Anchor 0 0 0.55 1
+    OffsetLeft 640
+    OffsetTop 265
+    OffsetRight -15
+    OffsetBottom 120
+   }
+   Color 0 0 0 0
+   {
+    ImageWidgetClass "{IMG1BG}" {
+     Name "RolePanelBackground"
+     Slot FrameWidgetSlot "{IMG1SLOT}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.12 0.12 0.12 0.85
+    }
+    ScrollLayoutWidgetClass "{A1B2C3D4E5F60001}" {
+     Name "RoleScroll"
+     Slot FrameWidgetSlot "{A1B2C3D4E5F60002}" {
+      Anchor 0 0 1 1
+      OffsetLeft 10
+      OffsetTop 10
+      OffsetRight 0
+      OffsetBottom -10
+     }
+     {
+      VerticalLayoutWidgetClass "{6908FA429BA60B05}" {
+       Name "RoleVBox"
+       Slot FrameWidgetSlot "{6908FA429BA60B10}" {
+        Anchor 0 0 1 1
+        OffsetLeft 0
+        OffsetTop 0
+        OffsetRight 0
+        OffsetBottom 0
+       }
+      }
+     }
+    }
+   }
+  }
+  FrameWidgetClass "{68F937C13DF80439}" {
+   Name "PlayerListContainer"
+   Slot FrameWidgetSlot "{68F46DB5310ABAD5}" {
+    Anchor 0.6 0 1 1
+    OffsetLeft -5
+    OffsetTop 265
+    OffsetRight 12.91
+    OffsetBottom 120
+   }
+   Color 0 0 0 0
+   {
+    ImageWidgetClass "{IMG2BG}" {
+     Name "PlayerPanelBackground"
+     Slot FrameWidgetSlot "{IMG2SLOT}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.12 0.12 0.12 0.85
+    }
+    ScrollLayoutWidgetClass "{B1B2C3D4E5F60001}" {
+     Name "PlayerScroll"
+     Slot FrameWidgetSlot "{B1B2C3D4E5F60002}" {
+      Anchor 0 0 1 1
+      OffsetLeft 10
+      OffsetTop 10
+      OffsetRight 0
+      OffsetBottom -10
+     }
+     {
+      VerticalLayoutWidgetClass "{6908FA429BA60BC2}" {
+       Name "PlayerVBox"
+       Slot FrameWidgetSlot "{6908FA429BA60BC5}" {
+        Anchor 0 0 1 1
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
+      }
+     }
+    }
+   }
+  }
+  TextWidgetClass "{68F937C13DF80A97}" {
+   Name "GMHint"
+   Slot FrameWidgetSlot "{68F46DB5310ABAA9}" {
+    Anchor 0.25 1 0.75 1
+    OffsetLeft 0
+    OffsetTop -115
+    OffsetRight 0
+    OffsetBottom -90
+   }
+   Color 0.55 0.85 0.55 1
+   Text "Только GameMaster может начать игру"
+  }
+  ButtonWidgetClass "{68F46DB5310ABAE5}" {
+   Name "StartGameButton"
+   Slot FrameWidgetSlot "{68F46DB5310ABAF3}" {
+    Anchor 0.25 1 0.75 1
+    OffsetLeft 0
+    OffsetTop -85
+    OffsetRight 0
+    OffsetBottom -15
+   }
+   Color 0.08 0.65 0.08 1
+   {
+    TextWidgetClass "{68F46DB5310ABA8C}" {
+     Name "StartGameText"
+     Slot ButtonWidgetSlot "{68F46DB5310ABA9A}" {
+     }
+     Color 1 1 1 1
+     Text ">>> НАЧАТЬ ИГРУ (Enter) <<<"
+    }
+   }
+  }
+  FrameWidgetClass "{690483026FEC4436}" {
+   Name "HudManagerLayout"
+   Slot FrameWidgetSlot "{5F0B1576FB3E03F4}" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   "Z Order" 11
+   components {
+    SCR_HUDMenuComponent "{5F0ADEF0C660AF98}" {
+     m_sIdentifier "EndScreenMenu"
+    }
+   }
+   {
+    FrameWidgetClass "{690483026FEC5441}" {
+     Name "Layer_Slots"
+     Slot FrameWidgetSlot "{5D62A913A6057240}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     {
+      VerticalLayoutWidgetClass "{690483026FEC5443}" {
+       Name "Group_Left"
+       Slot FrameWidgetSlot "{5D44B19A2BE9A6C4}" {
+        Anchor 0 0 0 1
+        OffsetLeft 0
+        OffsetTop 0
+        OffsetRight 600
+        OffsetBottom 0
+       }
+       Clipping False
+       components {
+        SCR_HUDGroupUIComponent "{5D44B19A39A468D7}" {
+         m_bEnableDebugFont 0
+        }
+       }
+       {
+        FrameWidgetClass "{690483026FEFA122}" {
+         Name "Filler0"
+         Slot LayoutSlot "{5D44B19A48E6BC77}" {
+          SizeMode Fill
+          FillWeight 0.3
+         }
+        }
+        FrameWidgetClass "{690483026FEFA123}" {
+         Name "Slot_Chat"
+         Slot LayoutSlot "{5D44B19A05C7B70A}" {
+         }
+         components {
+          SCR_HUDSlotUIComponent "{5D44B19A037B2FF4}" {
+           m_iPriority 1
+           m_aHeightSteps {
+            100 200 300
+           }
+           m_aWidthSteps {
+            600
+           }
+          }
+         }
+        }
+        FrameWidgetClass "{690483026FEFF90E}" {
+         Name "Slot_VON"
+         Slot LayoutSlot "{5D44B19A05C7B70F}" {
+         }
+         components {
+          SCR_HUDSlotUIComponent "{5D44B19A037B2FF9}" {
+           m_iPriority 1
+           m_aHeightSteps {
+            100 200
+           }
+           m_aWidthSteps {
+            600
+           }
+          }
+         }
+        }
+        FrameWidgetClass "{690483026FEFF9F1}" {
+         Name "Filler"
+         Slot LayoutSlot "{5D44B19A48E6BC78}" {
+          SizeMode Fill
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

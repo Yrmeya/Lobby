@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{81406471B7261481}Prefabs/Characters/Factions/OPFOR/USSR_Army/LobbySpectatorPrefab_v2.et"
+ Configurations {
+  EntityTemplateResourceClass PC {
+  }
+  EntityTemplateResourceClass XBOX_ONE : PC {
+  }
+  EntityTemplateResourceClass XBOX_SERIES : PC {
+  }
+  EntityTemplateResourceClass PS4 : PC {
+  }
+  EntityTemplateResourceClass PS5 : PC {
+  }
+  EntityTemplateResourceClass HEADLESS : PC {
+  }
+ }
+}

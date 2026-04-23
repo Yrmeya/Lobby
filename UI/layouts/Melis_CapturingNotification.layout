@@ -1,0 +1,35 @@
+FrameWidgetClass {
+ Name "CapturePointNotificationOverlay"
+ {
+  PanelWidgetClass "{68A68AD15B21F46F}" {
+   Name "Background"
+   Slot FrameWidgetSlot "{68A68AD15B21F472}" {
+    PositionX 725.197
+    OffsetLeft 725.197
+    PositionY 12.722
+    OffsetTop 12.722
+    SizeX 553.204
+    OffsetRight -1278.4
+    SizeY 71.6
+    OffsetBottom -84.322
+   }
+   {
+    TextWidgetClass "{68A68AD1408C0021}" {
+     Name "CaptureText"
+     Slot FrameWidgetSlot "{68A68AD1408C0035}" {
+      Anchor 0.044 0.148 0.044 0.148
+      PositionX -4.59
+      OffsetLeft -4.59
+      PositionY 0.187
+      OffsetTop 0.187
+      SizeX 520.285
+      OffsetRight -515.695
+      SizeY 47.166
+      OffsetBottom -47.353
+     }
+     Text "Точка оспаривается фракцией: United States (60s)"
+    }
+   }
+  }
+ }
+}

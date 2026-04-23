@@ -1,0 +1,30 @@
+GameProject {
+ ID "Lobbyv2"
+ GUID "68ED19AA75C8BFBF"
+ TITLE "Lobby_v2"
+ Dependencies {
+  "58D0FB3206B6F859"
+ }
+ Configurations {
+  GameProjectConfig PC {
+   InputManagerSettings InputManagerSettings "{50A48858902D5F64}" {
+    Default "{1CECBCDC65A5CA96}Configs/System/chimeraInputCommon.conf"
+   }
+   MenuManagerSettings MenuManagerSettings "{50C890C996B0A6FC}" {
+    MenuConfigs {
+     "{05092A408993C44B}Configs/System/chimeraMenus.conf"
+    }
+   }
+  }
+  GameProjectConfig XBOX_ONE {
+  }
+  GameProjectConfig XBOX_SERIES {
+  }
+  GameProjectConfig PS4 {
+  }
+  GameProjectConfig PS5 {
+  }
+  GameProjectConfig HEADLESS {
+  }
+ }
+}

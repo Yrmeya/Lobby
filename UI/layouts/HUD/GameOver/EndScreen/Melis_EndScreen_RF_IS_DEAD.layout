@@ -1,0 +1,44 @@
+OverlayWidgetClass : "{144919871D65F121}UI/layouts/HUD/GameOver/EndScreen/EndScreen.layout" {
+ {
+  FrameWidgetClass "{5F0B00B84EE97891}" {
+   Prefab "{5F0B00B84EE97891}"
+   {
+    FrameWidgetClass "{5F0B00B84EE97890}" {
+     Prefab "{5F0B00B84EE97890}"
+     {
+      TextWidgetClass "{688F58B87CA6626C}" {
+       Name "ReasonText"
+       Slot FrameWidgetSlot "{688F162993AEB682}" {
+        PositionX 700.48
+        OffsetLeft 700.48
+        PositionY 462
+        OffsetTop 462
+        SizeX 600
+        OffsetRight -1300.48
+        SizeY 50
+        OffsetBottom -512
+       }
+       Text "Силы обороны эверона были разбиты."
+       "Font Size" 45
+      }
+      TextWidgetClass "{688F58B87CA6626D}" {
+       Name "WinnerText"
+       Slot FrameWidgetSlot "{688F16299029FE74}" {
+        PositionX 701.051
+        OffsetLeft 701.1
+        PositionY 546.419
+        OffsetTop 546.4
+        SizeX 600
+        OffsetRight -1301.1
+        SizeY 50
+        OffsetBottom -596.4
+       }
+       Text "Эверон пал."
+       "Font Size" 45
+      }
+     }
+    }
+   }
+  }
+ }
+}

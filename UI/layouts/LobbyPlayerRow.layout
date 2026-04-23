@@ -1,0 +1,52 @@
+HorizontalLayoutWidgetClass {
+ Name "rootFrame"
+ Color 0.06 0.06 0.06 0.9
+ {
+  TextWidgetClass {
+   Name "VONIndicator"
+   Text "V"
+   Slot LayoutSlot {
+   }
+   Color 0.15 0.15 0.15 1
+  }
+  TextWidgetClass {
+   Name "Gap1"
+   Text "  "
+   Slot LayoutSlot {
+   }
+   Color 0 0 0 0
+  }
+  TextWidgetClass {
+   Name "PlayerName"
+   Text ""
+   Slot LayoutSlot {
+   }
+  }
+  TextWidgetClass {
+   Name "Gap2"
+   Text "  "
+   Slot LayoutSlot {
+   }
+   Color 0 0 0 0
+  }
+  TextWidgetClass {
+   Name "SquadLabel"
+   Text ""
+   Slot LayoutSlot {
+   }
+  }
+  TextWidgetClass {
+   Name "Gap3"
+   Text "  "
+   Slot LayoutSlot {
+   }
+   Color 0 0 0 0
+  }
+  TextWidgetClass {
+   Name "RoleLabel"
+   Text ""
+   Slot LayoutSlot {
+   }
+  }
+ }
+}

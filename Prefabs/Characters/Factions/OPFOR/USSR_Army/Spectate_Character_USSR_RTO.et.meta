@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{C9918FF71A9A8545}Prefabs/Characters/Factions/OPFOR/USSR_Army/Spectate_Character_USSR_RTO.et"
+ Configurations {
+  EntityTemplateResourceClass PC {
+  }
+  EntityTemplateResourceClass XBOX_ONE : PC {
+  }
+  EntityTemplateResourceClass XBOX_SERIES : PC {
+  }
+  EntityTemplateResourceClass PS4 : PC {
+  }
+  EntityTemplateResourceClass PS5 : PC {
+  }
+  EntityTemplateResourceClass HEADLESS : PC {
+  }
+ }
+}

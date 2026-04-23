@@ -1,0 +1,21 @@
+VerticalLayoutWidgetClass {
+ Name "rootFrame"
+ Slot FrameWidgetSlot {
+  Anchor 0 0 1 1
+ }
+ Color 0.08 0.08 0.08 0.95
+ {
+  TextWidgetClass {
+   Name "SquadName"
+   Text ""
+   Color 1 1 1 1
+   Slot LayoutSlot {}
+  }
+  VerticalLayoutWidgetClass {
+   Name "RoleList"
+   Slot FrameWidgetSlot {
+    Anchor 0 0 1 1
+   }
+  }
+ }
+}

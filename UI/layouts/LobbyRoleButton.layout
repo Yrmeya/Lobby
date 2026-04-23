@@ -1,0 +1,101 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ Slot FrameWidgetSlot "{6916E30BED25D8D2}" {
+  Anchor 0 0 1 0
+ }
+ Color 0.05 0.35 0.05 0.95
+ {
+  ButtonWidgetClass "{6908BE222507444F}" {
+   Name "RoleButton"
+   Slot FrameWidgetSlot "{6908BE222507445A}" {
+    Anchor 0.002 0 1 0.917
+    PositionX -3.432
+    OffsetLeft -3.432
+    PositionY 0
+    OffsetTop 0
+    SizeX 757.629
+    OffsetRight -754.197
+    SizeY 1.946
+    OffsetBottom -1.946
+   }
+   Color 1 1 1 0
+  }
+  ImageWidgetClass "{6916E30BED25D8B8}" {
+   Name "HoverOverlay"
+   Slot FrameWidgetSlot "{6916E30BED25DB40}" {
+    Anchor 0 0 1 0.924
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 754.782
+    OffsetRight -754.782
+    SizeY 112.378
+    OffsetBottom -112.378
+   }
+   Color 1 1 1 0
+  }
+  HorizontalLayoutWidgetClass "{6908BE22250745F0}" {
+   Name "HBox"
+   Slot FrameWidgetSlot "{6908BE2225074582}" {
+    Anchor 0 0 1 1
+    PositionX 10
+    OffsetLeft 10
+    PositionY 5
+    OffsetTop 5
+    SizeX -23.632
+    OffsetRight 13.632
+    SizeY -4.81
+    OffsetBottom -0.19
+   }
+   Color 1 1 1 1
+   {
+    TextWidgetClass "{6908BE222507459A}" {
+     Name "Label"
+     Slot LayoutSlot "{6908BE22250745AF}" {
+      SizeMode Fill
+      FillWeight 5
+     }
+     Color 0.9 1 0.9 1
+     Text ""
+    }
+    TextWidgetClass "{6916E30BED25DB33}" {
+     Name "Gap1"
+     Slot LayoutSlot "{6916E30BED25DBCD}" {
+      SizeMode Fill
+      FillWeight 0.5
+     }
+     Color 0 0 0 0
+     Text "   "
+    }
+    TextWidgetClass "{6908BE22250745A6}" {
+     Name "SlotInfo"
+     Slot LayoutSlot "{6908BE22250745B8}" {
+      SizeMode Fill
+      FillWeight 1.5
+     }
+     Color 0.7 0.9 0.7 1
+     Text ""
+    }
+    TextWidgetClass "{6916E30BED25DBEE}" {
+     Name "Gap2"
+     Slot LayoutSlot "{6916E30BED25DBE1}" {
+      SizeMode Fill
+      FillWeight 0.5
+     }
+     Color 0 0 0 0
+     Text "   "
+    }
+    TextWidgetClass "{6908BE22250745BC}" {
+     Name "OccupiedBy"
+     Slot LayoutSlot "{6908BE22250745B4}" {
+      SizeMode Fill
+      FillWeight 1.5
+     }
+     Color 0.7 0.9 0.7 1
+     Text ""
+    }
+   }
+  }
+ }
+}
