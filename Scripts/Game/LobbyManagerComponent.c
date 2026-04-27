@@ -22,7 +22,7 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
     protected ref map<int, IEntity>              m_mSpectators = new map<int, IEntity>();
     protected ref set<int>                       m_aDeadPlayers = new set<int>();
     
-    protected ref array<SCR_AIGroup> m_aCreatedGroups = {};
+    protected ref array<int> m_aCreatedGroupIDs = {};
     
     protected bool m_bLocalJIPSpectator = false;
 
@@ -44,7 +44,7 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
     string GetSquadName(int squadIndex)
     {
         if (squadIndex < 0 || squadIndex >= m_aSquads.Count()) return "---";
-        return m_aSquads[squadIndex].m_sSquadName; // Убедись что тут m_aSquads, а не m_aSquadConfig если было так
+        return m_aSquads[squadIndex].m_sSquadName;
     }
 
     string GetRoleName(int squadIndex, int roleIndex)
@@ -167,7 +167,7 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
 
     protected void SpawnAllAndClose()
     {
-        m_aCreatedGroups.Clear();
+        m_aCreatedGroupIDs.Clear();
         
         foreach (int pid, LobbyPlayerData data : m_mPlayers)
             SpawnPlayerWithRole(pid, data);
@@ -187,8 +187,6 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
                 playerFaction = facMgr.GetFactionByKey(m_sPlayerFactionKey);
         }
 
-        m_aCreatedGroups.Clear();
-
         if (playerFaction)
         {
             for (int i = 0; i < m_aSquads.Count(); i++)
@@ -196,12 +194,13 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
                 SCR_AIGroup newGroup = groupsMgr.CreateNewPlayableGroup(playerFaction);
                 if (newGroup)
                 {
-                    m_aCreatedGroups.Insert(newGroup);
-                    Print(string.Format("[LobbyMgr] Created group %1 for squad %2", newGroup.GetGroupID(), i), LogLevel.NORMAL);
+                    int groupID = newGroup.GetGroupID();
+                    m_aCreatedGroupIDs.Insert(groupID);
+                    Print(string.Format("[LobbyMgr] Created radio group %1 for squad %2", groupID, i), LogLevel.NORMAL);
                 }
                 else
                 {
-                    m_aCreatedGroups.Insert(null); 
+                    m_aCreatedGroupIDs.Insert(-1); 
                     Print("[LobbyMgr] ERROR: Failed to create group!", LogLevel.ERROR);
                 }
             }
@@ -213,85 +212,31 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
 
         foreach (int pid, LobbyPlayerData data : m_mPlayers)
         {
-            if (!data.m_CharacterEntity) 
-            {
-                Print("[LobbyMgr] ERROR: Player " + pid + " has NO Character Entity!", LogLevel.ERROR);
-                continue;
-            }
+            if (!data.m_CharacterEntity) continue;
             
             PlayerController pc = GetGame().GetPlayerManager().GetPlayerController(pid);
-            if (!pc) 
-            {
-                Print("[LobbyMgr] ERROR: PlayerController not found for " + pid, LogLevel.ERROR);
-                continue;
-            }
+            if (!pc) continue;
 
-            // 1. ДОБАВЛЯЕМ В ОТРЯД
-            if (data.m_iSquadIndex >= 0 && data.m_iSquadIndex < m_aCreatedGroups.Count())
-            {
-                SCR_AIGroup targetGroup = m_aCreatedGroups[data.m_iSquadIndex];
-                if (targetGroup)
-                {
-                    Print("[LobbyMgr] Trying to add Player " + pid + " to Group " + targetGroup.GetGroupID() + " (Squad " + data.m_iSquadIndex + ")", LogLevel.NORMAL);
-                    
-                    // КРИТИЧЕСКИ ВАЖНО: Будим AI на секунду, чтобы движок увидел сущность
-                    AIControlComponent aiControlInit = AIControlComponent.Cast(data.m_CharacterEntity.FindComponent(AIControlComponent));
-                    if (aiControlInit) 
-                        aiControlInit.ActivateAI();
-                    else
-                        Print("[LobbyMgr] WARNING: No AIControlComponent on character!", LogLevel.WARNING);
-                    
-                    // Вызываем ванильный метод добавления игрока
-                    targetGroup.AddPlayer(pid);
-                    
-                    // ПРОВЕРЯЕМ РЕЗУЛЬТАТ
-                    if (targetGroup.IsPlayerInGroup(pid))
-                    {
-                        Print("[LobbyMgr] SUCCESS: Player " + pid + " is now in group!", LogLevel.NORMAL);
-                        
-                        // --- НАЗНАЧЕНИЕ КОМАНДИРА ОТРЯДА ---
-                        bool isLeaderRole = false;
-                        string roleName = GetRoleName(data.m_iSquadIndex, data.m_iRoleIndex);
-                        
-                        // Если в названии роли есть "Leader" или "Commander" - делаем его лидером
-                       /* if (roleName.Contains("Leader", false) || roleName.Contains("Commander", false))
-                        {
-                            isLeaderRole = true;
-                        }*/
-                        
-                        // Альтернатива: Если хочешь, чтобы лидером был всегда 0-й слот отряда, раскомментируй строку ниже:
-                        if (data.m_iRoleIndex == 0) isLeaderRole = true;
-                        
-                        if (isLeaderRole)
-                        {
-                            Print("[LobbyMgr] Player " + pid + " is Squad Leader! Assigning as Group Leader...", LogLevel.NORMAL);
-                            targetGroup.SetGroupLeader(pid);
-                        }
-                    }
-                    else
-                        Print("[LobbyMgr] FATAL: Player " + pid + " was NOT added to group!", LogLevel.ERROR);
-                }
-                else
-                {
-                    Print("[LobbyMgr] ERROR: targetGroup is NULL for squad index " + data.m_iSquadIndex, LogLevel.ERROR);
-                }
-            }
-            else
-            {
-                Print("[LobbyMgr] Player " + pid + " has invalid squad index (" + data.m_iSquadIndex + "). Skipping group.", LogLevel.WARNING);
-            }
+            AIControlComponent aiControl = AIControlComponent.Cast(data.m_CharacterEntity.FindComponent(AIControlComponent));
+            if (aiControl)
+                aiControl.DeactivateAI();
 
-            // 2. ПЕРЕДАЕМ КОНТРОЛЬ ИГРОКУ И РЕПЛИКАЦИЮ
             RplComponent rpl = RplComponent.Cast(data.m_CharacterEntity.FindComponent(RplComponent));
             if (rpl)
                 rpl.GiveExt(pc.GetRplIdentity(), false);
 
             pc.SetControlledEntity(data.m_CharacterEntity);
 
-            // 3. ВЫКЛЮЧАЕМ AI (когда всё уже привязано)
-            AIControlComponent aiControl = AIControlComponent.Cast(data.m_CharacterEntity.FindComponent(AIControlComponent));
-            if (aiControl)
-                aiControl.DeactivateAI();
+            if (groupsMgr && data.m_iSquadIndex >= 0 && data.m_iSquadIndex < m_aCreatedGroupIDs.Count())
+            {
+                int targetGroupID = m_aCreatedGroupIDs[data.m_iSquadIndex];
+                if (targetGroupID != -1)
+                {
+                    int result = groupsMgr.AddPlayerToGroup(targetGroupID, pid);
+                    if (result != -1)
+                        Print("[LobbyMgr] Player " + pid + " assigned to radio group " + targetGroupID, LogLevel.NORMAL);
+                }
+            }
         }
         
         GetGame().GetCallqueue().CallLater(BroadcastClose_Delayed, 1000, false);
@@ -341,30 +286,13 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         spawnMat[3] = spawnPos;
 
         EntitySpawnParams params = new EntitySpawnParams();
-        params.TransformMode = ETransformMode.WORLD;; // Опечатка в твоем коде была WORLD, но на всякий случай
+        params.TransformMode = ETransformMode.WORLD;
         params.Transform = spawnMat;
 
         IEntity character = GetGame().SpawnEntityPrefab(res, GetGame().GetWorld(), params);
         if (!character) return false;
 
         data.m_CharacterEntity = character; 
-
-        // ПРИНУДИТЕЛЬНО задаем фракцию персонажу (решает проблему "зашел без фракции")
-        if (m_sPlayerFactionKey != "")
-        {
-            FactionManager facMgr = GetGame().GetFactionManager();
-            if (facMgr)
-            {
-                Faction faction = facMgr.GetFactionByKey(m_sPlayerFactionKey);
-                if (faction)
-                {
-                    SCR_FactionAffiliationComponent facComp = SCR_FactionAffiliationComponent.Cast(character.FindComponent(SCR_FactionAffiliationComponent));
-                    if (facComp) 
-                        facComp.SetAffiliatedFaction(faction);
-                }
-            }
-        }
-
         return true;
     }
 
@@ -397,7 +325,10 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         Resource res = Resource.Load(prefab);
         if (!res || !res.IsValid()) return;
 
-        vector spawnPos = "0 50000 0";
+        array<SCR_SpawnPoint> spawnPoints = SCR_SpawnPoint.GetSpawnPoints();
+        vector spawnPos = vector.Zero;
+        if (spawnPoints && !spawnPoints.IsEmpty())
+            spawnPos = spawnPoints[0].GetOrigin();
 
         vector spawnMat[4];
         Math3D.MatrixIdentity4(spawnMat);
@@ -414,30 +345,47 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         LobbyPlayerData pdata = m_mPlayers.Get(playerId);
         if (pdata) pdata.m_SpectatorEntity = entity;
 
+        PlayerController pcSpec = GetGame().GetPlayerManager().GetPlayerController(playerId);
+        if (pcSpec)
+        {
+            // МАГИЯ СЕТЕВОГО ВЛАДЕНИЯ: Без этого сервер не будет маршрутизировать голос от этой болванки!
+            RplComponent rpl = RplComponent.Cast(entity.FindComponent(RplComponent));
+            if (rpl)
+                rpl.GiveExt(pcSpec.GetRplIdentity(), false);
+
+            pcSpec.SetControlledEntity(entity);
+        }
+
         ChimeraCharacter character = ChimeraCharacter.Cast(entity);
         if (character)
         {
             entity.ClearFlags(EntityFlags.VISIBLE);
             
-            Physics physics = entity.GetPhysics();
-            if (physics) physics.ChangeSimulationState(SimulationState.NONE);
-            
-            AIControlComponent aiControl = AIControlComponent.Cast(entity.FindComponent(AIControlComponent));
-            if (aiControl) aiControl.DeactivateAI();
-
             Faction faction = null;
             if (m_sPlayerFactionKey != "")
             {
                 FactionManager facMgr = GetGame().GetFactionManager();
-                if (facMgr) faction = facMgr.GetFactionByKey(m_sPlayerFactionKey);
+                if (facMgr) 
+                    faction = facMgr.GetFactionByKey(m_sPlayerFactionKey);
             }
-            if (faction) SCR_FactionAffiliationComponent.SetFaction(entity, faction);
+            if (faction)
+            {
+                SCR_FactionAffiliationComponent.SetFaction(entity, faction);
+            }
+            else
+            {
+                Print("[LobbyMgr] ERROR: m_sPlayerFactionKey is empty or invalid! Voice will NOT work!", LogLevel.ERROR);
+            }
 
             SCR_DamageManagerComponent dmgMgr = SCR_DamageManagerComponent.Cast(entity.FindComponent(SCR_DamageManagerComponent));
             if (dmgMgr) dmgMgr.FullHeal();
-
-            PlayerController pcSpec = GetGame().GetPlayerManager().GetPlayerController(playerId);
-            if (pcSpec) pcSpec.SetControlledEntity(entity);
+            
+            SCR_CharacterControllerComponent charCtrl = SCR_CharacterControllerComponent.Cast(character.GetCharacterController());
+            if (charCtrl)
+            {
+                charCtrl.SetDisableMovementControls(true); 
+                charCtrl.SetDisableWeaponControls(true);   
+            }
         }
     }
 

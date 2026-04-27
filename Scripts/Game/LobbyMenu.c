@@ -12,51 +12,6 @@ class LobbyMenu : MenuBase
 
     protected static LobbyMenu s_Instance;
 
-    // =====================================================================
-    // СИСТЕМА ОТСЛЕЖИВАНИЯ ГОЛОСА
-    // =====================================================================
-    protected const int DIRECT_VON_FREQUENCY = 32000; 
-    protected const float SPEECH_TIMEOUT_MS = 350.0;
-    
-    protected static ref map<int, float> s_mSpeechTimeouts = new map<int, float>();
-    protected Melis_LobbyVoNComponent m_pLocalVoNComponent; 
-    protected bool m_bLocalPTTActive = false;
-
-    static bool IsPlayerTalking(int playerId)
-    {
-        float worldTime = GetGame().GetWorld().GetWorldTime();
-        if (!s_mSpeechTimeouts.Contains(playerId)) return false;
-        return s_mSpeechTimeouts.Get(playerId) >= worldTime;
-    }
-
-    protected void UpdateSpeechTime(int playerId)
-    {
-        float worldTime = GetGame().GetWorld().GetWorldTime();
-        s_mSpeechTimeouts.Set(playerId, worldTime + SPEECH_TIMEOUT_MS);
-    }
-
-    protected void OnVoNReceiveStart(int playerId, BaseTransceiver receiver, int frequency, float quality)
-    {        
-        if (frequency == DIRECT_VON_FREQUENCY)
-        {
-            UpdateSpeechTime(playerId);
-        }
-    }
-
-    protected void Action_VoNStart()
-    {
-        Print("[LobbyMenu] КНОПКА PTT НАЖАТА!", LogLevel.ERROR);
-        m_bLocalPTTActive = true;
-        int localPlayerId = GetLocalPlayerId();
-        if (localPlayerId != -1) UpdateSpeechTime(localPlayerId);
-    }
-
-    protected void Action_VoNStop()
-    {
-        m_bLocalPTTActive = false;
-    }
-    // =====================================================================
-
     protected TextWidget   m_wStatusText;
     protected TextWidget   m_wPlayerCountText;
     protected TextWidget   m_wGMHint;
@@ -65,14 +20,18 @@ class LobbyMenu : MenuBase
     protected Widget       m_wPlayerVBox;
 
     protected ref array<Widget> m_aPlayerRows = {};
+
     protected Widget m_wChatHudRoot;
     protected int    m_iChatHudOriginalZOrder;
+
     protected Widget m_wHoveredRoleFrame;
 
-    protected bool m_bWasGM        = false;
+    protected bool m_bWasGM       = false;
     protected bool m_bStartPressed = false;
     protected int  m_iTick         = 0;
     protected bool m_bSquadsBuilt  = false;
+    
+    protected bool m_bLocalIsTalking = false;
 
     protected ref map<int, string> m_mNames  = new map<int, string>();
     protected ref map<int, int>    m_mSquads = new map<int, int>();
@@ -82,24 +41,28 @@ class LobbyMenu : MenuBase
 
     override void OnMenuOpen()
     {
+        Print("[LOBBY DEBUG] =====================================================================", LogLevel.WARNING);
+        Print("[LOBBY DEBUG] === OnMenuOpen STARTED ===", LogLevel.WARNING);
+        
         LobbyManagerComponent mgr = LobbyManagerComponent.GetInstance();
         if (mgr && !mgr.IsLobbyActive())
         {
+            Print("[LOBBY DEBUG] ERROR: Lobby is NOT active! Menu will close now.", LogLevel.ERROR);
             GetGame().GetCallqueue().CallLater(CloseSelf, 0, false);
             return;
         }
+        Print("[LOBBY DEBUG] Lobby is active. Proceeding with init...", LogLevel.WARNING);
 
-        s_Instance          = this;
-        m_bStartPressed     = false;
-        m_iTick             = 0;
-        m_bSquadsBuilt      = false;
+        s_Instance         = this;
+        m_bStartPressed    = false;
+        m_iTick            = 0;
+        m_bSquadsBuilt     = false;
         m_wHoveredRoleFrame = null;
-        m_bLocalPTTActive   = false;
+        m_bLocalIsTalking  = false; 
 
         m_mNames.Clear();
         m_mSquads.Clear();
         m_mRoles.Clear();
-        s_mSpeechTimeouts.Clear();
 
         Widget root = GetRootWidget();
         m_wStatusText      = TextWidget.Cast(root.FindAnyWidget("LobbyStatus"));
@@ -128,14 +91,55 @@ class LobbyMenu : MenuBase
         BuildPlayerRows();
         RaiseChatHud();
 
+        Print("[LOBBY DEBUG] Registering Input Listeners...", LogLevel.WARNING);
+        InputManager inp = GetGame().GetInputManager();
+        if (inp)
+        {
+            inp.AddActionListener("MenuBack",            EActionTrigger.DOWN, Action_Escape);
+            inp.AddActionListener("LobbyGameForceStart", EActionTrigger.DOWN, Action_ForceStart);
+            inp.AddActionListener("EditorToggle",        EActionTrigger.DOWN, Action_EditorToggle);
+            
+            // Наши целевые кнопки
+            inp.AddActionListener("VONDirect", EActionTrigger.DOWN, Action_LobbyVoNOn);
+            inp.AddActionListener("VONDirect", EActionTrigger.UP, Action_LobbyVoNOff);
+            inp.AddActionListener("VONChannel", EActionTrigger.DOWN, Action_LobbyVoNOn);
+            inp.AddActionListener("VONChannel", EActionTrigger.UP, Action_LobbyVoNOff);
+            
+            // ТЕСТОВАЯ КНОПКА (Пробел). Если она сработает в логах, а T - нет, значит проблема в биндах T.
+            inp.AddActionListener("Jump", EActionTrigger.DOWN, Action_TestJump);
+            
+            Print("[LOBBY DEBUG] Input Listeners registered SUCCESSFULLY!", LogLevel.WARNING);
+        }
+        else
+        {
+            Print("[LOBBY DEBUG] ERROR: InputManager is NULL!", LogLevel.ERROR);
+        }
+
         GetGame().GetCallqueue().CallLater(OnTick, UI_TICK_MS, true);
+        Print("[LOBBY DEBUG] === OnMenuOpen FINISHED ===", LogLevel.WARNING);
+        Print("[LOBBY DEBUG] =====================================================================", LogLevel.WARNING);
     }
 
     override void OnMenuClose()
     {
+        Print("[LOBBY DEBUG] OnMenuClose called!", LogLevel.WARNING);
+        
         GetGame().GetCallqueue().Remove(OnTick);
         GetGame().GetCallqueue().Remove(CloseSelf);
-        ClearVoNListener();
+
+        InputManager inp = GetGame().GetInputManager();
+        if (inp)
+        {
+            inp.RemoveActionListener("MenuBack",            EActionTrigger.DOWN, Action_Escape);
+            inp.RemoveActionListener("LobbyGameForceStart", EActionTrigger.DOWN, Action_ForceStart);
+            inp.RemoveActionListener("EditorToggle",        EActionTrigger.DOWN, Action_EditorToggle);
+            
+            inp.RemoveActionListener("VONDirect", EActionTrigger.DOWN, Action_LobbyVoNOn);
+            inp.RemoveActionListener("VONDirect", EActionTrigger.UP, Action_LobbyVoNOff);
+            inp.RemoveActionListener("VONChannel", EActionTrigger.DOWN, Action_LobbyVoNOn);
+            inp.RemoveActionListener("VONChannel", EActionTrigger.UP, Action_LobbyVoNOff);
+            inp.RemoveActionListener("Jump", EActionTrigger.DOWN, Action_TestJump);
+        }
 
         if (m_wChatHudRoot)
             m_wChatHudRoot.SetZOrder(m_iChatHudOriginalZOrder);
@@ -144,59 +148,30 @@ class LobbyMenu : MenuBase
         m_mNames.Clear();
         m_mSquads.Clear();
         m_mRoles.Clear();
+
         m_wHoveredRoleFrame = null;
+        m_bLocalIsTalking = false; 
         s_Instance = null;
     }
 
-    override void OnMenuUpdate(float tDelta) 
-    { 
-        if (!m_pLocalVoNComponent)
-        {
-            SetupVoNListener();
-        }
+    override void OnMenuUpdate(float tDelta) {} 
+
+    override void OnMenuFocusGained()
+    {
+        Print("[LOBBY DEBUG] Menu Focus GAINED!", LogLevel.WARNING);
+        super.OnMenuFocusGained();
     }
 
-    protected void SetupVoNListener()
+    override void OnMenuFocusLost()
     {
-        PlayerController pc = GetGame().GetPlayerController();
-        if (!pc) return;
-        
-        IEntity controlledEntity = pc.GetControlledEntity();
-        if (!controlledEntity) return;
-
-        m_pLocalVoNComponent = Melis_LobbyVoNComponent.Cast(controlledEntity.FindComponent(Melis_LobbyVoNComponent));
-        if (m_pLocalVoNComponent)
-        {
-            // Если видишь это в логе - префаб собран ПРАВИЛЬНО, чужой голос будет работать
-            Print("[LobbyMenu] Melis_LobbyVoNComponent FOUND! Subscribed to remote voice.", LogLevel.NORMAL);
-            m_pLocalVoNComponent.GetOnReceiveStart().Insert(OnVoNReceiveStart);
-        }
-        else
-        {
-            // Если это спамит бесконечно - ты забыл повесить скрипт на префаб в Workbench!
-            Print("[LobbyMenu] Melis_LobbyVoNComponent NOT FOUND on entity: " + controlledEntity.GetName(), LogLevel.WARNING);
-        }
-    }
-
-    protected void ClearVoNListener()
-    {
-        if (m_pLocalVoNComponent)
-        {
-            m_pLocalVoNComponent.GetOnReceiveStart().Remove(OnVoNReceiveStart);
-            m_pLocalVoNComponent = null;
-        }
+        Print("[LOBBY DEBUG] Menu Focus LOST!", LogLevel.WARNING);
+        Action_LobbyVoNOff();
+        super.OnMenuFocusLost();
     }
 
     protected void OnTick()
     {
         m_iTick++;
-
-        if (m_bLocalPTTActive)
-        {
-            int localPlayerId = GetLocalPlayerId();
-            if (localPlayerId != -1) UpdateSpeechTime(localPlayerId);
-        }
-
         LobbyManagerComponent mgr = LobbyManagerComponent.GetInstance();
         if (mgr && !mgr.IsLobbyActive()) 
         { 
@@ -249,7 +224,10 @@ class LobbyMenu : MenuBase
         }
     }
 
-    protected void CloseSelf() { GetGame().GetMenuManager().CloseMenu(this); }
+    protected void CloseSelf() 
+    { 
+        GetGame().GetMenuManager().CloseMenu(this); 
+    }
 
     protected void BuildSquadGroups()
     {
@@ -323,7 +301,8 @@ class LobbyMenu : MenuBase
 
     void OnPlayerAssigned(int playerId, int squadIndex, int roleIndex)
     {
-        if (!m_mNames.Contains(playerId)) m_mNames.Set(playerId, "Player " + playerId);
+        if (!m_mNames.Contains(playerId)) 
+            m_mNames.Set(playerId, "Player " + playerId);
         m_mSquads.Set(playerId, squadIndex); 
         m_mRoles.Set(playerId, roleIndex);
     }
@@ -405,7 +384,8 @@ class LobbyMenu : MenuBase
                         if (m_mNames.Contains(pid)) 
                         { 
                             string pn = m_mNames.Get(pid); 
-                            if (pn != "") occupantName = pn; 
+                            if (pn != "") 
+                                occupantName = pn; 
                         } 
                     }
                 }
@@ -416,7 +396,8 @@ class LobbyMenu : MenuBase
                 bool isHovered = (frame == m_wHoveredRoleFrame);
 
                 TextWidget slotInfo = TextWidget.Cast(frame.FindAnyWidget("SlotInfo"));
-                if (slotInfo) slotInfo.SetText("" + occupied + "/" + maxSlots);
+                if (slotInfo) 
+                    slotInfo.SetText("" + occupied + "/" + maxSlots);
                     
                 TextWidget occupiedByW = TextWidget.Cast(frame.FindAnyWidget("OccupiedBy"));
                 if (occupiedByW) 
@@ -505,9 +486,15 @@ class LobbyMenu : MenuBase
 
     protected void SetPlayerRow(Widget row, string playerName, string squadName, string roleName, bool isMe, bool hasRole, int playerId)
     {
-        bool isTalking = IsPlayerTalking(playerId);
+        bool isTalking;
+        if (isMe) {
+            isTalking = m_bLocalIsTalking;
+        } else {
+            isTalking = SCR_VonDisplay.IsPlayerTalking(playerId);
+        }
 
         Widget vonIndicator = row.FindAnyWidget("VONIndicator");
+        
         if (vonIndicator)
         {
             if (isTalking)
@@ -546,7 +533,8 @@ class LobbyMenu : MenuBase
         Widget cur = w;
         while (cur) 
         { 
-            if (cur.GetName().StartsWith("ROLE_")) return cur; 
+            if (cur.GetName().StartsWith("ROLE_")) 
+                return cur; 
             cur = cur.GetParent(); 
         }
         return null;
@@ -602,7 +590,11 @@ class LobbyMenu : MenuBase
 
     override bool OnClick(Widget w, int x, int y, int button)
     {
-        if (w == m_wStartButton) { Action_ForceStart(); return true; }
+        if (w == m_wStartButton) 
+        { 
+            Action_ForceStart(); 
+            return true; 
+        }
         
         Widget cur = w;
         while (cur)
@@ -614,7 +606,11 @@ class LobbyMenu : MenuBase
                 int sep = -1;
                 for (int c = 0; c < tail.Length(); c++) 
                 { 
-                    if (tail.Substring(c, 1) == "_") { sep = c; break; } 
+                    if (tail.Substring(c, 1) == "_") 
+                    { 
+                        sep = c; 
+                        break; 
+                    } 
                 }
                 if (sep >= 0) 
                 { 
@@ -654,32 +650,46 @@ class LobbyMenu : MenuBase
         }
     }
 
-    override void OnMenuFocusGained()
+    // =====================================================================
+    // ПЕРЕХВАТ PTT И ТЕСТЫ
+    // =====================================================================
+    
+    // ТЕСТОВАЯ ФУНКЦИЯ ДЛЯ ПРОБЕЛА
+    void Action_TestJump()
     {
-        super.OnMenuFocusGained();
-        InputManager inp = GetGame().GetInputManager();
-        inp.AddActionListener("MenuBack",            EActionTrigger.DOWN, Action_Escape);
-        inp.AddActionListener("LobbyGameForceStart", EActionTrigger.DOWN, Action_ForceStart);
-        inp.AddActionListener("EditorToggle",        EActionTrigger.DOWN, Action_EditorToggle);
-        
-        // ИСПОЛЬЗУЕМ DOWN И UP
-        inp.AddActionListener("VONDirect", EActionTrigger.DOWN, Action_VoNStart);
-        inp.AddActionListener("VONDirect", EActionTrigger.UP,   Action_VoNStop);
+        Print("[LOBBY DEBUG] &&&&&&&& TEST JUMP WORKS! Input is reaching LobbyMenu! &&&&&&&&", LogLevel.WARNING);
     }
 
-    override void OnMenuFocusLost()
+    void Action_LobbyVoNOn()
     {
-        InputManager inp = GetGame().GetInputManager();
-        inp.RemoveActionListener("MenuBack",            EActionTrigger.DOWN, Action_Escape);
-        inp.RemoveActionListener("LobbyGameForceStart", EActionTrigger.DOWN, Action_ForceStart);
-        inp.RemoveActionListener("EditorToggle",        EActionTrigger.DOWN, Action_EditorToggle);
+        Print("[LOBBY DEBUG] >>> VON ON Action Triggered! >>>", LogLevel.WARNING);
         
-        inp.RemoveActionListener("VONDirect", EActionTrigger.DOWN, Action_VoNStart);
-        inp.RemoveActionListener("VONDirect", EActionTrigger.UP,   Action_VoNStop);
-        
-        m_bLocalPTTActive = false;
-        super.OnMenuFocusLost();
+        SCR_PlayerController scrPc = SCR_PlayerController.Cast(GetGame().GetPlayerController());
+        if (scrPc) 
+        {
+            Print("[LOBBY DEBUG] SCR_PlayerController found! Calling LobbyVoNEnable...", LogLevel.WARNING);
+            scrPc.LobbyVoNEnable();
+            m_bLocalIsTalking = true; 
+        } 
+        else 
+        {
+            Print("[LOBBY DEBUG] ERROR: SCR_PlayerController is NULL!", LogLevel.ERROR);
+        }
     }
+    
+    void Action_LobbyVoNOff()
+    {
+        Print("[LOBBY DEBUG] >>> VON OFF Action Triggered! >>>", LogLevel.WARNING);
+        
+        SCR_PlayerController scrPc = SCR_PlayerController.Cast(GetGame().GetPlayerController());
+        if (scrPc) 
+        {
+            scrPc.LobbyVoNDisable();
+        }
+        
+        m_bLocalIsTalking = false; 
+    }
+    // =====================================================================
 
     protected void Action_Escape()     { GetGame().GetCallqueue().CallLater(DoPauseMenu, 0); }
     protected void DoPauseMenu()       { ArmaReforgerScripted.OpenPauseMenu(); }
@@ -688,7 +698,11 @@ class LobbyMenu : MenuBase
     {
         if (!IsLocalPlayerGM() || m_bStartPressed) return;
         m_bStartPressed = true;
-        if (m_wStartButton) { m_wStartButton.SetEnabled(false); m_wStartButton.SetOpacity(0.3); }
+        if (m_wStartButton) 
+        { 
+            m_wStartButton.SetEnabled(false); 
+            m_wStartButton.SetOpacity(0.3); 
+        }
         LobbyRPCComponent rpc = LobbyRPCComponent.GetInstance();
         if (rpc) rpc.RequestStartGame();
     }
@@ -698,7 +712,10 @@ class LobbyMenu : MenuBase
         if (!IsLocalPlayerGM()) return;
         SCR_EditorManagerEntity em = SCR_EditorManagerEntity.GetInstance();
         if (!em) return;
-        if (em.IsOpened()) em.Close(); else em.Open();
+        if (em.IsOpened()) 
+            em.Close(); 
+        else 
+            em.Open();
     }
 
     protected void RaiseChatHud()
@@ -706,7 +723,11 @@ class LobbyMenu : MenuBase
         WorkspaceWidget ws = GetGame().GetWorkspace();
         if (!ws) return;
         Widget chatPanel = ws.FindAnyWidget("ChatPanel");
-        if (!chatPanel) { GetGame().GetCallqueue().CallLater(RaiseChatHud, 100, false); return; }
+        if (!chatPanel) 
+        { 
+            GetGame().GetCallqueue().CallLater(RaiseChatHud, 100, false); 
+            return; 
+        }
         Widget w = chatPanel;
         while (w && w.GetParent() != ws) w = w.GetParent();
         if (!w) return;

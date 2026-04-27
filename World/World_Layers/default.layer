@@ -1,7 +1,5 @@
 SCR_MapEntity MapEntity : "{731564B66F91B107}Prefabs/World/Game/MapEntity.et" {
  coords 6120.51 157.665 6281.017
- "Map Geometry Data" "{984B832A2B86D79B}worlds/Eden/Eden.topo"
- "Satellite background image" "{6EB44A780AF7DDDF}UI/Textures/Map/worlds/EveronRasterized.edds"
  {
   CommentEntity {
    coords 0 1 0
@@ -174,8 +172,10 @@ SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Ed
      }
     }
    }
-   m_sSpectatorPrefab "{C9918FF71A9A8545}Prefabs/Characters/Factions/OPFOR/USSR_Army/Spectate_Character_USSR_RTO.et"
+   m_sSpectatorPrefab "{D3AAB40A8A9A3226}Prefabs/Characters/Factions/OPFOR/USSR_Army/Spectotor_Character_USSR_Rifleman.et"
    m_sPlayerFactionKey "USSR"
+  }
+  LobbyPlayerControllerComponent "{6936BD67A4935180}" {
   }
   LobbyRPCComponent "{68FAA6174052452F}" {
   }
@@ -184,16 +184,6 @@ SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Ed
  }
  coords 6120.51 157.4 6278.017
  m_bAutoInitEditor 0
- {
-  SCR_FactionManager {
-   ID "56E685E92F1B7E7A"
-   Factions {
-    SCR_Faction "{56DEAC40D3C2E623}" {
-     m_bIsPlayable 1
-    }
-   }
-  }
- }
 }
 SCR_SpawnPoint : "{987991DCED3DC197}PrefabsEditable/SpawnPoints/E_SpawnPoint.et" {
  components {
@@ -202,4 +192,6 @@ SCR_SpawnPoint : "{987991DCED3DC197}PrefabsEditable/SpawnPoints/E_SpawnPoint.et"
   }
  }
  coords 4900.856 95.596 4663.685
+ scale 0.8
+ m_fSpawnPositionUsageRange 7.3
 }
