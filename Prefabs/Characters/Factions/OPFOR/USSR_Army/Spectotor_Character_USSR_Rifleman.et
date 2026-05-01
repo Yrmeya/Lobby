@@ -1,7 +1,22 @@
 SCR_ChimeraCharacter : "{3ECA3A935BC069B9}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_BaseLoadout.et" {
  ID "520EC961A090B1EE"
  components {
+  CharacterSoundComponent "{520EA1D2F659CF84}" {
+   FoliageCollisionLayer "CharSpecialCollisionNoCollide"
+  }
+  SCR_CommunicationSoundComponent "{54FD05D0C92D071F}" {
+   "Sound Geometry" 0
+  }
   LobbyPlayerControllerComponent "{6936BD63E96541E3}" {
+  }
+  MeshObject "{520EA1D2F659C81F}" {
+   PixelSizeScale 1
+  }
+  SCR_CharacterStaminaComponent "{520EA1D2F659C824}" {
+   BreathNormalFrequency 0.001
+   BreathNormalMagnitude 0.001
+   BreathExhaustedFrequency 0.001
+   BreathExhaustedMagnitude 0.001
   }
   SCR_EditableCharacterComponent "{520EA1D2F659C85C}" {
    m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
@@ -67,4 +82,5 @@ SCR_ChimeraCharacter : "{3ECA3A935BC069B9}Prefabs/Characters/Factions/OPFOR/USSR
   }
  }
  coords 0 0 0
+ scale 0.3
 }

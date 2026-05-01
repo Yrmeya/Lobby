@@ -33,6 +33,12 @@ class LobbyMenu : MenuBase
     
     protected bool m_bLocalIsTalking = false;
 
+    // Сохраненные настройки громкости
+    protected float m_fSavedSFX;
+    protected float m_fSavedMusic;
+    protected float m_fSavedDialog;
+    protected float m_fSavedVoiceChat;
+
     protected ref map<int, string> m_mNames  = new map<int, string>();
     protected ref map<int, int>    m_mSquads = new map<int, int>();
     protected ref map<int, int>    m_mRoles  = new map<int, int>();
@@ -41,17 +47,12 @@ class LobbyMenu : MenuBase
 
     override void OnMenuOpen()
     {
-        Print("[LOBBY DEBUG] =====================================================================", LogLevel.WARNING);
-        Print("[LOBBY DEBUG] === OnMenuOpen STARTED ===", LogLevel.WARNING);
-        
         LobbyManagerComponent mgr = LobbyManagerComponent.GetInstance();
         if (mgr && !mgr.IsLobbyActive())
         {
-            Print("[LOBBY DEBUG] ERROR: Lobby is NOT active! Menu will close now.", LogLevel.ERROR);
             GetGame().GetCallqueue().CallLater(CloseSelf, 0, false);
             return;
         }
-        Print("[LOBBY DEBUG] Lobby is active. Proceeding with init...", LogLevel.WARNING);
 
         s_Instance         = this;
         m_bStartPressed    = false;
@@ -91,7 +92,6 @@ class LobbyMenu : MenuBase
         BuildPlayerRows();
         RaiseChatHud();
 
-        Print("[LOBBY DEBUG] Registering Input Listeners...", LogLevel.WARNING);
         InputManager inp = GetGame().GetInputManager();
         if (inp)
         {
@@ -99,31 +99,23 @@ class LobbyMenu : MenuBase
             inp.AddActionListener("LobbyGameForceStart", EActionTrigger.DOWN, Action_ForceStart);
             inp.AddActionListener("EditorToggle",        EActionTrigger.DOWN, Action_EditorToggle);
             
-            // Наши целевые кнопки
             inp.AddActionListener("VONDirect", EActionTrigger.DOWN, Action_LobbyVoNOn);
             inp.AddActionListener("VONDirect", EActionTrigger.UP, Action_LobbyVoNOff);
             inp.AddActionListener("VONChannel", EActionTrigger.DOWN, Action_LobbyVoNOn);
             inp.AddActionListener("VONChannel", EActionTrigger.UP, Action_LobbyVoNOff);
-            
-            // ТЕСТОВАЯ КНОПКА (Пробел). Если она сработает в логах, а T - нет, значит проблема в биндах T.
-            inp.AddActionListener("Jump", EActionTrigger.DOWN, Action_TestJump);
-            
-            Print("[LOBBY DEBUG] Input Listeners registered SUCCESSFULLY!", LogLevel.WARNING);
-        }
-        else
-        {
-            Print("[LOBBY DEBUG] ERROR: InputManager is NULL!", LogLevel.ERROR);
         }
 
         GetGame().GetCallqueue().CallLater(OnTick, UI_TICK_MS, true);
-        Print("[LOBBY DEBUG] === OnMenuOpen FINISHED ===", LogLevel.WARNING);
-        Print("[LOBBY DEBUG] =====================================================================", LogLevel.WARNING);
+        
+        // Глушим окружение и делаем голос громким
+        GetGame().GetCallqueue().CallLater(MuteEnvironment, 1500, false, true);
     }
 
     override void OnMenuClose()
     {
-        Print("[LOBBY DEBUG] OnMenuClose called!", LogLevel.WARNING);
-        
+        // Возвращаем звук
+        MuteEnvironment(false);
+
         GetGame().GetCallqueue().Remove(OnTick);
         GetGame().GetCallqueue().Remove(CloseSelf);
 
@@ -138,7 +130,6 @@ class LobbyMenu : MenuBase
             inp.RemoveActionListener("VONDirect", EActionTrigger.UP, Action_LobbyVoNOff);
             inp.RemoveActionListener("VONChannel", EActionTrigger.DOWN, Action_LobbyVoNOn);
             inp.RemoveActionListener("VONChannel", EActionTrigger.UP, Action_LobbyVoNOff);
-            inp.RemoveActionListener("Jump", EActionTrigger.DOWN, Action_TestJump);
         }
 
         if (m_wChatHudRoot)
@@ -158,13 +149,11 @@ class LobbyMenu : MenuBase
 
     override void OnMenuFocusGained()
     {
-        Print("[LOBBY DEBUG] Menu Focus GAINED!", LogLevel.WARNING);
         super.OnMenuFocusGained();
     }
 
     override void OnMenuFocusLost()
     {
-        Print("[LOBBY DEBUG] Menu Focus LOST!", LogLevel.WARNING);
         Action_LobbyVoNOff();
         super.OnMenuFocusLost();
     }
@@ -195,6 +184,13 @@ class LobbyMenu : MenuBase
         CheckGMVisibility();
         UpdateHeader();
         RefreshUI();
+		  
+        // =====================================================================
+        // ПРИНУДИТЕЛЬНОЕ УДЕРЖАНИЕ ТИШИНЫ
+        // Движок Wwise постоянно пытается вернуть звук ветра. 
+        // Если лобби открыто, мы каждый кадр сбрасываем его обратно в 0.
+        // =====================================================================
+
     }
 
     protected void SyncFromManager()
@@ -651,36 +647,20 @@ class LobbyMenu : MenuBase
     }
 
     // =====================================================================
-    // ПЕРЕХВАТ PTT И ТЕСТЫ
+    // ПЕРЕХВАТ PTT 
     // =====================================================================
-    
-    // ТЕСТОВАЯ ФУНКЦИЯ ДЛЯ ПРОБЕЛА
-    void Action_TestJump()
-    {
-        Print("[LOBBY DEBUG] &&&&&&&& TEST JUMP WORKS! Input is reaching LobbyMenu! &&&&&&&&", LogLevel.WARNING);
-    }
-
     void Action_LobbyVoNOn()
     {
-        Print("[LOBBY DEBUG] >>> VON ON Action Triggered! >>>", LogLevel.WARNING);
-        
         SCR_PlayerController scrPc = SCR_PlayerController.Cast(GetGame().GetPlayerController());
         if (scrPc) 
         {
-            Print("[LOBBY DEBUG] SCR_PlayerController found! Calling LobbyVoNEnable...", LogLevel.WARNING);
             scrPc.LobbyVoNEnable();
             m_bLocalIsTalking = true; 
         } 
-        else 
-        {
-            Print("[LOBBY DEBUG] ERROR: SCR_PlayerController is NULL!", LogLevel.ERROR);
-        }
     }
     
     void Action_LobbyVoNOff()
     {
-        Print("[LOBBY DEBUG] >>> VON OFF Action Triggered! >>>", LogLevel.WARNING);
-        
         SCR_PlayerController scrPc = SCR_PlayerController.Cast(GetGame().GetPlayerController());
         if (scrPc) 
         {
@@ -689,6 +669,60 @@ class LobbyMenu : MenuBase
         
         m_bLocalIsTalking = false; 
     }
+    // =====================================================================
+
+    // =====================================================================
+    // УПРАВЛЕНИЕ ЗВУКОМ ОКРУЖЕНИЯ (По API AudioSystem)
+    // =====================================================================
+    // =====================================================================
+    // УПРАВЛЕНИЕ ЗВУКОМ ОКРУЖЕНИЯ (По API AudioSystem)
+    // =====================================================================
+     // =====================================================================
+    // УПРАВЛЕНИЕ ЗВУКОМ ОКРУЖЕНИЯ (По логике мода Earplugs)
+    // =====================================================================
+    // =====================================================================
+    // УПРАВЛЕНИЕ ЗВУКОМ (Точно по логике Earplugs мода)
+    // =====================================================================
+    void MuteEnvironment(bool mute)
+    {
+        UserSettings engineSettings = GetGame().GetEngineUserSettings();
+        if (!engineSettings) return;
+        
+        BaseContainer audioSettings = engineSettings.GetModule("AudioSettings");
+        if (!audioSettings) return;
+        
+        if (mute)
+        {
+            // Читаем текущие настройки из конфига (они в масштабе 0-100)
+            float sfxVol = 100, musicVol = 100, vonVol = 100, dialogVol = 100;
+            audioSettings.Get("VolumeSfx", sfxVol);
+            audioSettings.Get("VolumeMusic", musicVol);
+            audioSettings.Get("VolumeVoN", vonVol);
+            audioSettings.Get("VolumeDialog", dialogVol);
+            
+            // Переводим в масштаб 0.0 - 1.0 и сохраняем
+            m_fSavedSFX = sfxVol * 0.01;
+            m_fSavedMusic = musicVol * 0.01;
+            m_fSavedVoiceChat = vonVol * 0.01;
+            m_fSavedDialog = dialogVol * 0.01;
+            
+            // Применяем тишину и громкий голос ОДИН РАЗ
+            AudioSystem.SetMasterVolume(AudioSystem.SFX, 0.0);
+            AudioSystem.SetMasterVolume(AudioSystem.Music, 0.0);
+            AudioSystem.SetMasterVolume(AudioSystem.Dialog, 0.0);
+            AudioSystem.SetMasterVolume(AudioSystem.VoiceChat, 1.0);
+        }
+        else
+        {
+            // Возвращаем всё как было
+            AudioSystem.SetMasterVolume(AudioSystem.SFX, m_fSavedSFX);
+            AudioSystem.SetMasterVolume(AudioSystem.Music, m_fSavedMusic);
+            AudioSystem.SetMasterVolume(AudioSystem.VoiceChat, m_fSavedVoiceChat);
+            AudioSystem.SetMasterVolume(AudioSystem.Dialog, m_fSavedDialog);
+        }
+    }
+    // =====================================================================
+    // =====================================================================
     // =====================================================================
 
     protected void Action_Escape()     { GetGame().GetCallqueue().CallLater(DoPauseMenu, 0); }

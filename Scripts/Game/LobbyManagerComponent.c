@@ -196,6 +196,7 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
                 {
                     int groupID = newGroup.GetGroupID();
                     m_aCreatedGroupIDs.Insert(groupID);
+                    // Имена пока НЕ ставим, иначе они слетят при назначении лидера
                     Print(string.Format("[LobbyMgr] Created radio group %1 for squad %2", groupID, i), LogLevel.NORMAL);
                 }
                 else
@@ -210,6 +211,7 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
             Print("[LobbyMgr] ERROR: Invalid faction key in LobbyManagerComponent settings!", LogLevel.ERROR);
         }
 
+        // 1. Добавляем всех игроков в группы и передаем им контроль
         foreach (int pid, LobbyPlayerData data : m_mPlayers)
         {
             if (!data.m_CharacterEntity) continue;
@@ -239,6 +241,52 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
             }
         }
         
+        // 2. НАЗНАЧЕНИЕ ЛИДЕРОВ ПО ПРИОРИТЕТУ РОЛЕЙ
+        for (int i = 0; i < m_aCreatedGroupIDs.Count(); i++)
+        {
+            int targetGroupID = m_aCreatedGroupIDs[i];
+            if (targetGroupID == -1) continue;
+
+            SCR_AIGroup group = groupsMgr.FindGroup(targetGroupID);
+            if (!group) continue;
+
+            int leaderPID = -1;
+            array<ref LobbyRoleConfig> roles = GetSquadRoles(i);
+            
+            // Идем по ролям сверху вниз (0, 1, 2...)
+            if (roles)
+            {
+                for (int roleIdx = 0; roleIdx < roles.Count(); roleIdx++)
+                {
+                    // Ищем любого игрока в этом скваде с этой ролью
+                    foreach (int pid, LobbyPlayerData data : m_mPlayers)
+                    {
+                        if (data.m_iSquadIndex == i && data.m_iRoleIndex == roleIdx)
+                        {
+                            leaderPID = pid;
+                            break; // Нашли игрока на самой верхней роли, выходим из перебора игроков
+                        }
+                    }
+                    
+                    if (leaderPID != -1)
+                        break; // Выходим из перебора ролей, так как лидер найден
+                }
+            }
+
+            // Если в скваде вообще есть игроки, назначаем лидера
+            if (leaderPID != -1)
+            {
+                group.SetGroupLeader(leaderPID);
+                Print("[LobbyMgr] Player " + leaderPID + " set as leader of squad " + i, LogLevel.NORMAL);
+            }
+
+            // 3. ВОССТАНАВЛИВАЕМ ИМЯ ГРУППЫ (т.к. SetGroupLeader его обнуляет)
+            if (m_aSquads[i] && m_aSquads[i].m_sSquadName != "")
+            {
+                group.SetCustomName(m_aSquads[i].m_sSquadName, 0);
+            }
+        }
+
         GetGame().GetCallqueue().CallLater(BroadcastClose_Delayed, 1000, false);
     }
 
@@ -313,6 +361,8 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         return pos;
     }
 
+	
+	
     protected void SpawnSpectatorForPlayer(int playerId)
     {
         ResourceName prefab = m_sSpectatorPrefab;
@@ -325,10 +375,15 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         Resource res = Resource.Load(prefab);
         if (!res || !res.IsValid()) return;
 
-        array<SCR_SpawnPoint> spawnPoints = SCR_SpawnPoint.GetSpawnPoints();
+        // =====================================================================
+        // СПАВН ВСЕХ В ОДНОЙ ТОЧКЕ
+        // =====================================================================
         vector spawnPos = vector.Zero;
+        array<SCR_SpawnPoint> spawnPoints = SCR_SpawnPoint.GetSpawnPoints();
         if (spawnPoints && !spawnPoints.IsEmpty())
-            spawnPos = spawnPoints[0].GetOrigin();
+            spawnPos = spawnPoints[0].GetOrigin(); // Берем координаты первой точки спавна
+            
+        // Никакой спирали! Все спавнятся строго в одних координатах.
 
         vector spawnMat[4];
         Math3D.MatrixIdentity4(spawnMat);
@@ -348,7 +403,7 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         PlayerController pcSpec = GetGame().GetPlayerManager().GetPlayerController(playerId);
         if (pcSpec)
         {
-            // МАГИЯ СЕТЕВОГО ВЛАДЕНИЯ: Без этого сервер не будет маршрутизировать голос от этой болванки!
+            // СЕТЕВОЕ ВЛАДЕНИЕ
             RplComponent rpl = RplComponent.Cast(entity.FindComponent(RplComponent));
             if (rpl)
                 rpl.GiveExt(pcSpec.GetRplIdentity(), false);
@@ -361,25 +416,48 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         {
             entity.ClearFlags(EntityFlags.VISIBLE);
             
+            // Устанавливаем фракцию
             Faction faction = null;
-            if (m_sPlayerFactionKey != "")
+            SCR_FactionManager facMgr = SCR_FactionManager.Cast(GetGame().GetFactionManager());
+            if (facMgr && m_sPlayerFactionKey != "")
             {
-                FactionManager facMgr = GetGame().GetFactionManager();
-                if (facMgr) 
-                    faction = facMgr.GetFactionByKey(m_sPlayerFactionKey);
+                faction = facMgr.GetFactionByKey(m_sPlayerFactionKey);
             }
+            
             if (faction)
             {
-                SCR_FactionAffiliationComponent.SetFaction(entity, faction);
+                // 1. На болванке (для голоса и ИИ)
+                FactionAffiliationComponent facComp = FactionAffiliationComponent.Cast(entity.FindComponent(FactionAffiliationComponent));
+                if (facComp)
+                    facComp.SetAffiliatedFaction(faction);
+                
+                // 2. На PlayerController (для флага в UI)
+                SCR_PlayerFactionAffiliationComponent playerFacComp = SCR_PlayerFactionAffiliationComponent.Cast(pcSpec.FindComponent(SCR_PlayerFactionAffiliationComponent));
+                if (playerFacComp)
+                {
+                    playerFacComp.SetAffiliatedFaction(faction);
+                    facMgr.UpdatePlayerFaction_S(playerFacComp);
+                }
             }
             else
             {
-                Print("[LobbyMgr] ERROR: m_sPlayerFactionKey is empty or invalid! Voice will NOT work!", LogLevel.ERROR);
+                Print("[LobbyMgr] ERROR: m_sPlayerFactionKey is empty or invalid!", LogLevel.ERROR);
             }
 
+            // Лечим
             SCR_DamageManagerComponent dmgMgr = SCR_DamageManagerComponent.Cast(entity.FindComponent(SCR_DamageManagerComponent));
             if (dmgMgr) dmgMgr.FullHeal();
-            
+
+            // Заморозка физики (на случай, если коллизии мешей пересекаются)
+            Physics phys = entity.GetPhysics();
+            if (phys)
+            {
+                phys.EnableGravity(false);
+                phys.SetVelocity("0 0 0");
+                phys.SetAngularVelocity("0 0 0");
+            }
+
+            // НЕ ДЕАКТИВИРУЕМ AI! 
             SCR_CharacterControllerComponent charCtrl = SCR_CharacterControllerComponent.Cast(character.GetCharacterController());
             if (charCtrl)
             {
@@ -388,7 +466,8 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
             }
         }
     }
-
+	
+	
     protected void DeleteSpectatorForPlayer(int playerId)
     {
         IEntity spectator = m_mSpectators.Get(playerId);

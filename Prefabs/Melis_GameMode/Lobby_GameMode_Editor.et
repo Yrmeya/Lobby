@@ -1,0 +1,135 @@
+SCR_GameModeEditor : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Editor/GameMode_Editor_Full.et" {
+ ID "56B2B479C6B96951"
+ components {
+  LobbyManagerComponent "{68F46D9555CF4AB3}" {
+   m_aSquads {
+    LobbySquadConfig "{68F46D96B155F96D}" {
+     m_sSquadName "Альфа"
+     m_aRoles {
+      LobbyRoleConfig "{6908AE36EF86A72B}" {
+       m_sRoleName "Радист"
+       m_sCharacterPrefab "{612F43A4D5AE765F}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_RTO.et"
+      }
+      LobbyRoleConfig "{6908AE36EC15473F}" {
+       m_sRoleName "Раведчик"
+       m_sCharacterPrefab "{F89D79B340033E32}Prefabs/Characters/Factions/OPFOR/USSR_Army/KLMK/Character_USSR_AMG_KLMK.et"
+      }
+      LobbyRoleConfig "{6916D69CF74075A8}" {
+       m_sRoleName "Раведчик"
+       m_sCharacterPrefab "{F89D79B340033E32}Prefabs/Characters/Factions/OPFOR/USSR_Army/KLMK/Character_USSR_AMG_KLMK.et"
+      }
+      LobbyRoleConfig "{6916D69CF5FA83EB}" {
+       m_sRoleName "Раведчик"
+       m_sCharacterPrefab "{F89D79B340033E32}Prefabs/Characters/Factions/OPFOR/USSR_Army/KLMK/Character_USSR_AMG_KLMK.et"
+      }
+      LobbyRoleConfig "{6916D69CF4FAB0A2}" {
+       m_sRoleName "Раведчик"
+       m_sCharacterPrefab "{F89D79B340033E32}Prefabs/Characters/Factions/OPFOR/USSR_Army/KLMK/Character_USSR_AMG_KLMK.et"
+      }
+      LobbyRoleConfig "{6916D69CFA80B5A8}" {
+       m_sRoleName "Раведчик"
+       m_sCharacterPrefab "{F89D79B340033E32}Prefabs/Characters/Factions/OPFOR/USSR_Army/KLMK/Character_USSR_AMG_KLMK.et"
+      }
+     }
+    }
+    LobbySquadConfig "{68F93858ABD04F81}" {
+     m_sSquadName "Браво"
+     m_aRoles {
+      LobbyRoleConfig "{6908AE36FDC0FEF3}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69CE72E9FFE}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69CE6761E1B}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69CE51B34E1}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69CE4182497}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69CEB69889F}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+     }
+    }
+    LobbySquadConfig "{6916D69B80C7F7E3}" {
+     m_sSquadName "Абраво"
+     m_aRoles {
+      LobbyRoleConfig "{6916D69B80C7F640}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69B80C7F646}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69B80C7F647}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69B80C7F644}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69B80C7F65A}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69B80C7C06A}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+     }
+    }
+    LobbySquadConfig "{6916D69B87E7A4AB}" {
+     m_sSquadName "Небраво"
+     m_aRoles {
+      LobbyRoleConfig "{6916D69B87E7A355}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69B87E7A348}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69B87E7A349}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69B87E7A34F}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69B87E7A34C}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+      LobbyRoleConfig "{6916D69B87E7A34D}" {
+       m_sRoleName "Гранатомёт"
+       m_sCharacterPrefab "{1C78331E156A3D65}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_AT.et"
+      }
+     }
+    }
+   }
+   m_sSpectatorPrefab "{D3AAB40A8A9A3226}Prefabs/Characters/Factions/OPFOR/USSR_Army/Spectotor_Character_USSR_Rifleman.et"
+   m_sPlayerFactionKey "USSR"
+  }
+  LobbyPlayerControllerComponent "{6936BD67A4935180}" {
+  }
+  LobbyRPCComponent "{68FAA6174052452F}" {
+  }
+  SCR_ReconnectSynchronizationComponent "{6908B107AF78BA91}" {
+  }
+ }
+ coords 6120.51 157.4 6278.017
+ m_bAutoInitEditor 0
+}
