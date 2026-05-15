@@ -9,7 +9,7 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
     [Attribute("", UIWidgets.ResourcePickerThumbnail, "Spectator prefab", "et", category: "LobbyManagerComponent")]
     protected ResourceName m_sSpectatorPrefab;
 
-    [Attribute("1.5", UIWidgets.EditBox, "Spawn random offset radius (m)", category: "LobbyManagerComponent: Settings")]
+    [Attribute("15.0", UIWidgets.EditBox, "Spawn random offset radius (m)", category: "LobbyManagerComponent: Settings")]
     protected float m_fSpawnOffsetRadius;
 
     [Attribute("", UIWidgets.EditBox, "Player Faction Key (e.g. US, USSR)", category: "LobbyManagerComponent: Settings")]
@@ -196,22 +196,14 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
                 {
                     int groupID = newGroup.GetGroupID();
                     m_aCreatedGroupIDs.Insert(groupID);
-                    // Имена пока НЕ ставим, иначе они слетят при назначении лидера
-                    Print(string.Format("[LobbyMgr] Created radio group %1 for squad %2", groupID, i), LogLevel.NORMAL);
                 }
                 else
                 {
                     m_aCreatedGroupIDs.Insert(-1); 
-                    Print("[LobbyMgr] ERROR: Failed to create group!", LogLevel.ERROR);
                 }
             }
         }
-        else
-        {
-            Print("[LobbyMgr] ERROR: Invalid faction key in LobbyManagerComponent settings!", LogLevel.ERROR);
-        }
 
-        // 1. Добавляем всех игроков в группы и передаем им контроль
         foreach (int pid, LobbyPlayerData data : m_mPlayers)
         {
             if (!data.m_CharacterEntity) continue;
@@ -234,14 +226,11 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
                 int targetGroupID = m_aCreatedGroupIDs[data.m_iSquadIndex];
                 if (targetGroupID != -1)
                 {
-                    int result = groupsMgr.AddPlayerToGroup(targetGroupID, pid);
-                    if (result != -1)
-                        Print("[LobbyMgr] Player " + pid + " assigned to radio group " + targetGroupID, LogLevel.NORMAL);
+                    groupsMgr.AddPlayerToGroup(targetGroupID, pid);
                 }
             }
         }
         
-        // 2. НАЗНАЧЕНИЕ ЛИДЕРОВ ПО ПРИОРИТЕТУ РОЛЕЙ
         for (int i = 0; i < m_aCreatedGroupIDs.Count(); i++)
         {
             int targetGroupID = m_aCreatedGroupIDs[i];
@@ -253,34 +242,27 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
             int leaderPID = -1;
             array<ref LobbyRoleConfig> roles = GetSquadRoles(i);
             
-            // Идем по ролям сверху вниз (0, 1, 2...)
             if (roles)
             {
                 for (int roleIdx = 0; roleIdx < roles.Count(); roleIdx++)
                 {
-                    // Ищем любого игрока в этом скваде с этой ролью
                     foreach (int pid, LobbyPlayerData data : m_mPlayers)
                     {
                         if (data.m_iSquadIndex == i && data.m_iRoleIndex == roleIdx)
                         {
                             leaderPID = pid;
-                            break; // Нашли игрока на самой верхней роли, выходим из перебора игроков
+                            break;
                         }
                     }
                     
                     if (leaderPID != -1)
-                        break; // Выходим из перебора ролей, так как лидер найден
+                        break;
                 }
             }
 
-            // Если в скваде вообще есть игроки, назначаем лидера
             if (leaderPID != -1)
-            {
                 group.SetGroupLeader(leaderPID);
-                Print("[LobbyMgr] Player " + leaderPID + " set as leader of squad " + i, LogLevel.NORMAL);
-            }
 
-            // 3. ВОССТАНАВЛИВАЕМ ИМЯ ГРУППЫ (т.к. SetGroupLeader его обнуляет)
             if (m_aSquads[i] && m_aSquads[i].m_sSquadName != "")
             {
                 group.SetCustomName(m_aSquads[i].m_sSquadName, 0);
@@ -361,29 +343,18 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         return pos;
     }
 
-	
-	
     protected void SpawnSpectatorForPlayer(int playerId)
     {
         ResourceName prefab = m_sSpectatorPrefab;
-        if (prefab == "") 
-        {
-            Print("[LobbyMgr] SpectatorPrefab is empty!", LogLevel.ERROR);
-            return;
-        }
+        if (prefab == "") return;
 
         Resource res = Resource.Load(prefab);
         if (!res || !res.IsValid()) return;
 
-        // =====================================================================
-        // СПАВН ВСЕХ В ОДНОЙ ТОЧКЕ
-        // =====================================================================
         vector spawnPos = vector.Zero;
         array<SCR_SpawnPoint> spawnPoints = SCR_SpawnPoint.GetSpawnPoints();
         if (spawnPoints && !spawnPoints.IsEmpty())
-            spawnPos = spawnPoints[0].GetOrigin(); // Берем координаты первой точки спавна
-            
-        // Никакой спирали! Все спавнятся строго в одних координатах.
+            spawnPos = spawnPoints[0].GetOrigin();
 
         vector spawnMat[4];
         Math3D.MatrixIdentity4(spawnMat);
@@ -403,11 +374,8 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         PlayerController pcSpec = GetGame().GetPlayerManager().GetPlayerController(playerId);
         if (pcSpec)
         {
-            // СЕТЕВОЕ ВЛАДЕНИЕ
             RplComponent rpl = RplComponent.Cast(entity.FindComponent(RplComponent));
-            if (rpl)
-                rpl.GiveExt(pcSpec.GetRplIdentity(), false);
-
+            if (rpl) rpl.GiveExt(pcSpec.GetRplIdentity(), false);
             pcSpec.SetControlledEntity(entity);
         }
 
@@ -415,23 +383,17 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         if (character)
         {
             entity.ClearFlags(EntityFlags.VISIBLE);
-            
-            // Устанавливаем фракцию
             Faction faction = null;
             SCR_FactionManager facMgr = SCR_FactionManager.Cast(GetGame().GetFactionManager());
             if (facMgr && m_sPlayerFactionKey != "")
             {
                 faction = facMgr.GetFactionByKey(m_sPlayerFactionKey);
             }
-            
             if (faction)
             {
-                // 1. На болванке (для голоса и ИИ)
                 FactionAffiliationComponent facComp = FactionAffiliationComponent.Cast(entity.FindComponent(FactionAffiliationComponent));
-                if (facComp)
-                    facComp.SetAffiliatedFaction(faction);
+                if (facComp) facComp.SetAffiliatedFaction(faction);
                 
-                // 2. На PlayerController (для флага в UI)
                 SCR_PlayerFactionAffiliationComponent playerFacComp = SCR_PlayerFactionAffiliationComponent.Cast(pcSpec.FindComponent(SCR_PlayerFactionAffiliationComponent));
                 if (playerFacComp)
                 {
@@ -439,16 +401,8 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
                     facMgr.UpdatePlayerFaction_S(playerFacComp);
                 }
             }
-            else
-            {
-                Print("[LobbyMgr] ERROR: m_sPlayerFactionKey is empty or invalid!", LogLevel.ERROR);
-            }
-
-            // Лечим
             SCR_DamageManagerComponent dmgMgr = SCR_DamageManagerComponent.Cast(entity.FindComponent(SCR_DamageManagerComponent));
             if (dmgMgr) dmgMgr.FullHeal();
-
-            // Заморозка физики (на случай, если коллизии мешей пересекаются)
             Physics phys = entity.GetPhysics();
             if (phys)
             {
@@ -456,8 +410,6 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
                 phys.SetVelocity("0 0 0");
                 phys.SetAngularVelocity("0 0 0");
             }
-
-            // НЕ ДЕАКТИВИРУЕМ AI! 
             SCR_CharacterControllerComponent charCtrl = SCR_CharacterControllerComponent.Cast(character.GetCharacterController());
             if (charCtrl)
             {
@@ -466,8 +418,109 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
             }
         }
     }
-	
-	
+
+    // =====================================================================
+    // JIP: Персонаж CIV на огромной высоте (БЕЗ убийства)
+    // =====================================================================
+    protected void SpawnJIPCharacterCiv(int playerId)
+    {
+        ResourceName prefab = m_sSpectatorPrefab;
+        if (prefab == "") return;
+
+        Resource res = Resource.Load(prefab);
+        if (!res || !res.IsValid()) return;
+
+        // Огромная высота
+        vector spawnPos = "0 100000 0"; 
+
+        vector spawnMat[4];
+        Math3D.MatrixIdentity4(spawnMat);
+        spawnMat[3] = spawnPos;
+
+        EntitySpawnParams params = new EntitySpawnParams();
+        params.TransformMode = ETransformMode.WORLD;
+        params.Transform = spawnMat;
+
+        IEntity entity = GetGame().SpawnEntityPrefab(res, GetGame().GetWorld(), params);
+        if (!entity) return;
+
+        m_mSpectators.Set(playerId, entity);
+        LobbyPlayerData data = m_mPlayers.Get(playerId);
+        if (data) data.m_CharacterEntity = entity;
+
+        PlayerController pcSpec = GetGame().GetPlayerManager().GetPlayerController(playerId);
+        if (pcSpec)
+        {
+            RplComponent rpl = RplComponent.Cast(entity.FindComponent(RplComponent));
+            if (rpl) rpl.GiveExt(pcSpec.GetRplIdentity(), false);
+            pcSpec.SetControlledEntity(entity);
+        }
+
+        ChimeraCharacter character = ChimeraCharacter.Cast(entity);
+        if (character)
+        {
+            entity.ClearFlags(EntityFlags.VISIBLE);
+            
+            // Принудительно устанавливаем фракцию CIV
+            SCR_FactionManager facMgr = SCR_FactionManager.Cast(GetGame().GetFactionManager());
+            if (facMgr)
+            {
+                Faction civFaction = facMgr.GetFactionByKey("CIV");
+                if (civFaction)
+                {
+                    FactionAffiliationComponent facComp = FactionAffiliationComponent.Cast(entity.FindComponent(FactionAffiliationComponent));
+                    if (facComp) facComp.SetAffiliatedFaction(civFaction);
+                    
+                    SCR_PlayerFactionAffiliationComponent playerFacComp = SCR_PlayerFactionAffiliationComponent.Cast(pcSpec.FindComponent(SCR_PlayerFactionAffiliationComponent));
+                    if (playerFacComp)
+                    {
+                        playerFacComp.SetAffiliatedFaction(civFaction);
+                        facMgr.UpdatePlayerFaction_S(playerFacComp);
+                    }
+                }
+                else
+                {
+                    Print("[LobbyMgr] WARNING: Faction 'CIV' not found in map!", LogLevel.WARNING);
+                }
+            }
+
+            SCR_DamageManagerComponent dmgMgr = SCR_DamageManagerComponent.Cast(entity.FindComponent(SCR_DamageManagerComponent));
+            if (dmgMgr) dmgMgr.FullHeal();
+            
+            Physics phys = entity.GetPhysics();
+            if (phys)
+            {
+                phys.EnableGravity(false);
+                phys.SetVelocity("0 0 0");
+                phys.SetAngularVelocity("0 0 0");
+            }
+            
+            SCR_CharacterControllerComponent charCtrl = SCR_CharacterControllerComponent.Cast(character.GetCharacterController());
+            if (charCtrl)
+            {
+                charCtrl.SetDisableMovementControls(true); 
+                charCtrl.SetDisableWeaponControls(true);   
+            }
+        }
+    }
+    
+    // Камера на точке спавна
+    protected void TransitionJIPCameraToGround(int playerId)
+    {
+        if (!Replication.IsServer()) return;
+        
+        vector groundPos = vector.Zero;
+        array<SCR_SpawnPoint> spawnPoints = SCR_SpawnPoint.GetSpawnPoints();
+        if (spawnPoints && !spawnPoints.IsEmpty())
+            groundPos = spawnPoints[0].GetOrigin();
+            
+        groundPos[1] = groundPos[1] + 50.0; // Поднимаем камеру на 50 метров над землей
+
+        LobbyRPCComponent rpc = LobbyRPCComponent.GetInstance();
+        if (rpc) rpc.BroadcastJIPCameraSpawn(playerId, groundPos);
+    }
+    // =====================================================================
+    
     protected void DeleteSpectatorForPlayer(int playerId)
     {
         IEntity spectator = m_mSpectators.Get(playerId);
@@ -478,26 +531,9 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         }
     }
 
-    protected void TransitionJIPToCamera(int playerId)
-    {
-        if (!Replication.IsServer()) return;
-        IEntity dummy = m_mSpectators.Get(playerId);
-        if (!dummy) return;
-        
-        vector spawnPos = dummy.GetOrigin();
-        spawnPos[1] = spawnPos[1] + 50.0;
-
-        LobbyRPCComponent rpc = LobbyRPCComponent.GetInstance();
-        if (rpc) rpc.BroadcastJIPCameraSpawn(playerId, spawnPos);
-    }
-
     protected IEntity SpawnDeathDummy(int playerId, vector pos)
     {
-        if (m_sSpectatorPrefab == "") 
-        {
-            Print("[LobbyMgr] SpectatorPrefab is empty for death dummy!", LogLevel.ERROR);
-            return null;
-        }
+        if (m_sSpectatorPrefab == "") return null;
 
         Resource res = Resource.Load(m_sSpectatorPrefab);
         if (!res || !res.IsValid()) return null;
@@ -593,12 +629,26 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
             
             if (!data || !data.m_CharacterEntity)
             {
-                Print("[LobbyMgr] Player " + playerId + " joined late (no character). Starting Camera Hijack phase...", LogLevel.NORMAL);
+                if (!data)
+                {
+                    data = new LobbyPlayerData(playerId);
+                    m_mPlayers.Set(playerId, data);
+                }
+                
+                // Важно: сразу добавляем в мертвые, чтобы EOnFrame не пытался "спасти" нас, если мы умрем в космосе
+                if (!m_aDeadPlayers.Contains(playerId))
+                    m_aDeadPlayers.Insert(playerId);
+                
+                Print("[LobbyMgr] Player " + playerId + " joined late (JIP).", LogLevel.NORMAL);
                 LobbyRPCComponent rpc = LobbyRPCComponent.GetInstance();
                 if (rpc) rpc.BroadcastJIPSpectator(playerId);
                 
-                GetGame().GetCallqueue().CallLater(SpawnSpectatorForPlayer, 1000, false, playerId);
-                GetGame().GetCallqueue().CallLater(TransitionJIPToCamera, 2500, false, playerId);
+                // 1. Спавним персонажа CIV в космосе и даем игроку контроль над ним
+                GetGame().GetCallqueue().CallLater(SpawnJIPCharacterCiv, 1000, false, playerId);
+                // 2. Телепортируем камеру игрока на землю (точка спавна)
+                GetGame().GetCallqueue().CallLater(TransitionJIPCameraToGround, 2500, false, playerId);
+                
+                // Убийство убрано! Болванчик будет жить в космосе вечно.
                 return;
             }
             

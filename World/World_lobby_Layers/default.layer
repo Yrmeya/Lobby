@@ -1,0 +1,16 @@
+SCR_GameModeEditor Lobby_GameMode_Editor1 : "{86FC1F48A460657B}Prefabs/Melis_GameMode/Lobby_GameMode_Editor.et" {
+ components {
+  LobbyDeathSpectatorComponent "{695C7DC5A8421066}" {
+   m_sSpectatorPrefab "{D3AAB40A8A9A3226}Prefabs/Characters/Factions/OPFOR/USSR_Army/Spectotor_Character_USSR_Rifleman.et"
+  }
+  SCR_RespawnSystemComponent "{56B2B4793051E7C9}" {
+   m_SpawnLogic SCR_MenuSpawnLogic "{5D44B78DAD98E7F9}" {
+    m_fDeployMenuOpenDelay 10000000000
+   }
+  }
+ }
+ coords 6401.451 159.257 6419.481
+}
+SCR_SpawnPoint : "{987991DCED3DC197}PrefabsEditable/SpawnPoints/E_SpawnPoint.et" {
+ coords 6384.209 158.726 6430.839
+}

@@ -124,7 +124,7 @@ class LobbyRPCComponent : ScriptComponent
         }
     }
 
-        void SpawnGhostSafe(int playerId, vector spawnPos)
+    void SpawnGhostSafe(int playerId, vector spawnPos)
     {
         // Закрываем вообще ВСЕ меню, включая ванильный EditorMenu, который открывается при смерти
         GetGame().GetMenuManager().CloseAllMenus();
