@@ -1,51 +1,64 @@
-HorizontalLayoutWidgetClass {
+VerticalLayoutWidgetClass {
  Name "rootFrame"
- Color 0.06 0.06 0.06 0.9
+ Color 0.05 0.056 0.06 0.85
  {
-  TextWidgetClass {
-   Name "VONIndicator"
-   Text "V"
-   Slot LayoutSlot {
+  HorizontalLayoutWidgetClass {
+   Name "NameRow"
+   Slot FrameWidgetSlot {
+    Anchor 0 0 1 0
    }
-   Color 0.15 0.15 0.15 1
-  }
-  TextWidgetClass {
-   Name "Gap1"
-   Text "  "
-   Slot LayoutSlot {
-   }
-   Color 0 0 0 0
-  }
-  TextWidgetClass {
-   Name "PlayerName"
-   Text ""
-   Slot LayoutSlot {
-   }
-  }
-  TextWidgetClass {
-   Name "Gap2"
-   Text "  "
-   Slot LayoutSlot {
-   }
-   Color 0 0 0 0
-  }
-  TextWidgetClass {
-   Name "SquadLabel"
-   Text ""
-   Slot LayoutSlot {
+   {
+    TextWidgetClass {
+     Name "VONIndicator"
+     Slot LayoutSlot {
+      Padding 2 0 2 0
+     }
+     Color 0.13 0.13 0.13 1
+     Text "●"
+    }
+    TextWidgetClass {
+     Name "PlayerName"
+     Slot LayoutSlot {
+      Padding 2 0 2 0
+      SizeMode Fill
+     }
+     Color 0.82 0.82 0.78 1
+     Text ""
+     "Font Size" 15
+     "Min Font Size" 11
+    }
    }
   }
-  TextWidgetClass {
-   Name "Gap3"
-   Text "  "
-   Slot LayoutSlot {
+  HorizontalLayoutWidgetClass {
+   Name "InfoRow"
+   Slot FrameWidgetSlot {
+    Anchor 0 0 1 1
    }
-   Color 0 0 0 0
-  }
-  TextWidgetClass {
-   Name "RoleLabel"
-   Text ""
-   Slot LayoutSlot {
+   {
+    TextWidgetClass {
+     Name "SquadLabel"
+     Slot LayoutSlot {
+      Padding 2 0 2 0
+      SizeMode Fill
+      FillWeight 1
+     }
+     Color 0.5 0.52 0.5 1
+     Text ""
+     "Font Size" 12
+     "Min Font Size" 9
+    }
+    TextWidgetClass {
+     Name "RoleLabel"
+     Slot LayoutSlot {
+      Padding 2 0 2 0
+      SizeMode Fill
+      FillWeight 1
+     }
+     Color 0.5 0.52 0.5 1
+     Text ""
+     "Font Size" 12
+     "Min Font Size" 9
+    }
    }
   }
  }

@@ -38,6 +38,30 @@ modded class SCR_PlayerController
         if (rpc) rpc.SV_StartGame();
     }
 
+    void RequestLobbyMapPoint(int worldX10, int worldY10)
+    {
+        Rpc(RPC_Lobby_MapPoint, worldX10, worldY10);
+    }
+
+    [RplRpc(RplChannel.Reliable, RplRcver.Server)]
+    protected void RPC_Lobby_MapPoint(int worldX10, int worldY10)
+    {
+        LobbyRPCComponent rpc = LobbyRPCComponent.GetInstance();
+        if (rpc) rpc.SV_PlaceMapPoint(GetPlayerId(), worldX10, worldY10);
+    }
+
+    void RequestLobbySpawnCiv()
+    {
+        Rpc(RPC_Lobby_SpawnCiv);
+    }
+
+    [RplRpc(RplChannel.Reliable, RplRcver.Server)]
+    protected void RPC_Lobby_SpawnCiv()
+    {
+        LobbyRPCComponent rpc = LobbyRPCComponent.GetInstance();
+        if (rpc) rpc.SV_SpawnCiv(GetPlayerId());
+    }
+
     // ==========================================
     // ЛОГИКА ГОЛОСА ДЛЯ ЛОББИ
     // ==========================================

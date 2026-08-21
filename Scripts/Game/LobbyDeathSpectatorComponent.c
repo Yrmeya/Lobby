@@ -74,8 +74,8 @@ class LobbyDeathSpectatorComponent : SCR_BaseGameModeComponent
     {
         Print(string.Format("[DeathSpectator] HandlePlayerDeath START for %1", playerId), LogLevel.NORMAL);
         
-        GetGame().GetCallqueue().CallLater(SpawnCivInSpace, 500, false, playerId);
-        GetGame().GetCallqueue().CallLater(MoveCameraToGround, 1500, false, playerId);
+        GetGame().GetCallqueue().CallLater(SpawnCivInSpace, 3000, false, playerId);
+        GetGame().GetCallqueue().CallLater(MoveCameraToGround, 3000, false, playerId);
     }
 
     protected void SpawnCivInSpace(int playerId)
@@ -204,6 +204,32 @@ class LobbyDeathSpectatorComponent : SCR_BaseGameModeComponent
         else
         {
             Print("[DeathSpectator] ERROR: LobbyRPCComponent not found!", LogLevel.ERROR);
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------
+    //! Возвращает копию списка погибших (основной источник правды для #spawnciv).
+    array<int> GetDeadPlayerIds()
+    {
+        array<int> result = {};
+        foreach (int pid : m_aDeadPlayers)
+            result.Insert(pid);
+        return result;
+    }
+
+    //------------------------------------------------------------------------------------------------
+    //! Вызывается после возрождения игрока (#spawnciv): убираем его из списка
+    //! мёртвых и удаляем CIV-болванчик в космосе, чтобы не копились сущности
+    //! и следующая смерть игрока снова отслеживалась.
+    void NotifyPlayerRespawned(int playerId)
+    {
+        m_aDeadPlayers.Remove(playerId);
+
+        IEntity spaceCiv = m_mSpaceCivs.Get(playerId);
+        if (spaceCiv)
+        {
+            SCR_EntityHelper.DeleteEntityAndChildren(spaceCiv);
+            m_mSpaceCivs.Remove(playerId);
         }
     }
 

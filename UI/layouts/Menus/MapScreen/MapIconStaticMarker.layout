@@ -1,0 +1,68 @@
+FrameWidgetClass "{6A1C838FF629ECFB}" {
+ Name "rootWidget"
+ Clipping False
+ "Ignore Cursor" 0
+ Color 1 1 1 1
+ {
+  ImageWidgetClass "{6A1C838FF629ECF1}" {
+   Name "Icon"
+   Slot FrameWidgetSlot "{7183A7268656527B}" {
+    Anchor 0.5 0.5 0.5 0.5
+    PositionX 0
+    OffsetLeft 0
+    OffsetTop 0
+    SizeX 100
+    OffsetRight -100
+    SizeY 30
+    OffsetBottom -30
+    Alignment 0.5 0.5
+    SizeToContent 1
+   }
+   "Is Visible" 0
+   Color 1 1 1 0
+   "Inherit Color" 1
+   Size 100 100
+  }
+  TextWidgetClass "{6A1C838FF629ECEC}" {
+   Name "Title"
+   Slot FrameWidgetSlot "{240A2761FDAB8909}" {
+    Anchor 0.5 0.5 0.5 0.5
+    OffsetLeft 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+    Alignment 0.5 0.5
+    SizeToContent 1
+   }
+   Text "Title"
+   "Font Size" 18
+   "Min Font Size" 18
+   "Horizontal Alignment" Center
+   "Vertical Alignment" Center
+   FontProperties FontProperties "{49122793D8958592}" {
+    OutlineSize 0
+    OutlineColor 0 0 0 1
+   }
+  }
+  TextWidgetClass "{6A1C838FF629ECED}" {
+   Name "SubTitle"
+   Slot FrameWidgetSlot "{240A2761FDAB8909}" {
+    Anchor 0.5 0.5 0.5 0.5
+    OffsetLeft 0
+    PositionY 20
+    OffsetTop 20
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom -20
+    Alignment 0.5 0.5
+    SizeToContent 1
+   }
+   Text "SubTitle"
+   "Font Size" 14
+   "Min Font Size" 14
+  }
+ }
+}

@@ -1,0 +1,41 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ Slot FrameWidgetSlot "AA0001B200000101" {
+  Anchor 0 0 0 0
+  OffsetLeft 0
+  OffsetTop 0
+  OffsetRight 0
+  OffsetBottom 0
+ }
+ "Z Order" 1000
+ Color 1 1 1 0
+ {
+  ButtonWidgetClass "AA0001B200000102" {
+   Name "BackButton"
+   Slot FrameWidgetSlot "AA0001B200000103" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   Color 0.045 0.052 0.058 0.95
+   components {
+    SCR_ButtonBaseComponent "AA0001B200000106" {
+    }
+   }
+   {
+    TextWidgetClass "AA0001B200000104" {
+     Name "BackText"
+     Slot ButtonWidgetSlot "AA0001B200000105" {
+     }
+     Color 0.9 0.76 0.45 1
+     Text "ВЕРНУТЬСЯ В ЛОББИ (M)"
+     "Font Size" 15
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+   }
+  }
+ }
+}

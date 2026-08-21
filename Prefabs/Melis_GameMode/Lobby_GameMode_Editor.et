@@ -129,7 +129,15 @@ SCR_GameModeEditor : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Editor/GameMode_Editor_
   }
   SCR_ReconnectSynchronizationComponent "{6908B107AF78BA91}" {
   }
+  SCR_RespawnSystemComponent "{56B2B4793051E7C9}" {
+   m_SpawnLogic SCR_MenuSpawnLogic "{5D44B78DAD98E7F9}" {
+    m_fDeployMenuOpenDelay 10000000000
+   }
+  }
+  LobbyDeathSpectatorComponent "{695C7DC5A8421066}" {
+   m_sSpectatorPrefab "{D3AAB40A8A9A3226}Prefabs/Characters/Factions/OPFOR/USSR_Army/Spectotor_Character_USSR_Rifleman.et"
+  }
  }
- coords 6120.51 157.4 6278.017
+ coords 6401.451 159.257 6419.481
  m_bAutoInitEditor 0
 }

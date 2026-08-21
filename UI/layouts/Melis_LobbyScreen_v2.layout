@@ -2,178 +2,202 @@ FrameWidgetClass {
  Name "root"
  Color 0 0 0 0
  {
-  ImageWidgetClass "{68F937C13DFAEF7C}" {
+  ImageWidgetClass "AA000000000000001" {
    Name "LobbyBackground"
-   Slot FrameWidgetSlot "{68F46DB5310ABB87}" {
+   Slot FrameWidgetSlot "AA000000000000002" {
     Anchor 0 0 1 1
     OffsetLeft 0
     OffsetTop 0
     OffsetRight 0
     OffsetBottom 0
    }
-   Color 0.1208 0.0544 0.0493 1
+   Color 0.024 0.027 0.03 1
   }
-  TextWidgetClass "{68F937C13DFAEF73}" {
-   Name "LobbyTitle"
-   Slot FrameWidgetSlot "{68F46DB5310ABA4F}" {
+
+  FrameWidgetClass "AA000000000000003" {
+   Name "HeaderFrame"
+   Slot FrameWidgetSlot "AA000000000000004" {
     Anchor 0 0 1 0
-    OffsetLeft 650
-    OffsetTop 54
-    OffsetRight 10.29
-    OffsetBottom -119
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom -64
    }
-   Color 1 1 1 1
-   Text "ЛОББИ — ВЫБОР РОЛИ"
+   Color 0.035 0.039 0.044 1
+   {
+    TextWidgetClass "AA000000000000005" {
+     Name "LobbyTitle"
+     Slot FrameWidgetSlot "AA000000000000006" {
+      Anchor 0 0 1 0
+      OffsetLeft 16
+      OffsetTop 12
+      OffsetRight -620
+      OffsetBottom -8
+     }
+     Color 0.88 0.78 0.55 1
+     Text "ЛОББИ — ПОДГОТОВКА"
+     "Font Size" 34
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "AA000000000000007" {
+     Name "LobbyStatus"
+     Slot FrameWidgetSlot "AA000000000000008" {
+      Anchor 0.25 0 0.6 0
+      OffsetLeft 0
+      OffsetTop 16
+      OffsetRight -8
+      OffsetBottom -8
+     }
+     Color 0.62 0.64 0.6 1
+     Text "Ожидание игроков..."
+     "Font Size" 22
+     "Horizontal Alignment" Right
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "AA000000000000009" {
+     Name "PlayerCount"
+     Slot FrameWidgetSlot "AA00000000000000A" {
+      Anchor 0.25 0 0.6 0
+      OffsetLeft 0
+      OffsetTop 40
+      OffsetRight -8
+      OffsetBottom -8
+     }
+     Color 0.48 0.5 0.48 1
+     Text "Игроков: 0"
+     "Font Size" 17
+     "Horizontal Alignment" Right
+     "Vertical Alignment" Center
+    }
+    ButtonWidgetClass "AA00010800000009" {
+     Name "StartGameButton"
+     Slot FrameWidgetSlot "AA0001080000000A" {
+      Anchor 0.55 1 0.99 1
+      OffsetLeft 0
+      OffsetTop -58
+      OffsetRight 0
+      OffsetBottom -20
+     }
+     Color 0.045 0.052 0.058 1
+     {
+      TextWidgetClass "AA0001080000000B" {
+       Name "StartGameText"
+       Slot ButtonWidgetSlot "AA0001080000000C" {
+       }
+       Color 0.9 0.76 0.45 1
+       Text ">>> НАЧАТЬ ИГРУ (Enter) <<<"
+       "Font Size" 19
+       "Horizontal Alignment" Center
+       "Vertical Alignment" Center
+      }
+     }
+    }
+    TextWidgetClass "AA0001080000000D" {
+     Name "GMHint"
+     Slot FrameWidgetSlot "AA0001080000000E" {
+      Anchor 0.55 1 0.99 1
+      OffsetLeft 0
+      OffsetTop -18
+      OffsetRight 0
+      OffsetBottom -4
+     }
+     Color 0.55 0.62 0.52 1
+     Text "Только GameMaster может начать игру"
+     "Font Size" 13
+     "Horizontal Alignment" Center
+    }
+   }
   }
-  TextWidgetClass "{68F937C13DF90806}" {
-   Name "LobbyStatus"
-   Slot FrameWidgetSlot "{68F46DB5310ABA68}" {
+
+  ImageWidgetClass "AA00000000000000B" {
+   Name "HeaderAccent"
+   Slot FrameWidgetSlot "AA00000000000000C" {
     Anchor 0 0 1 0
-    OffsetLeft 650
-    OffsetTop 130
-    OffsetRight 11.614
-    OffsetBottom -170
+    OffsetLeft 0
+    OffsetTop 62
+    OffsetRight 0
+    OffsetBottom -2
    }
-   Color 0.8 0.8 0.8 1
-   Text "Ожидание игроков..."
+   Color 0.8 0.62 0.3 0.45
   }
-  TextWidgetClass "{68F937C13DF90804}" {
-   Name "PlayerCount"
-   Slot FrameWidgetSlot "{68F46DB5310ABA7C}" {
-    Anchor 0 0 1 0
-    OffsetLeft 650
-    OffsetTop 175
-    OffsetRight 12.76
-    OffsetBottom -210
-   }
-   Color 0.7 0.7 0.7 1
-   Text "Игроков: 0"
-  }
-  TextWidgetClass "{68F937C13DF98C66}" {
-   Name "VoiceChatHint"
-   Slot FrameWidgetSlot "{68F46DB5310ABA1B}" {
-    Anchor 0 0 1 0
-    OffsetLeft 650
-    OffsetTop 210
-    OffsetRight 15.612
-    OffsetBottom -240
-   }
-   Color 0.5 0.8 0.5 1
-   Text "Голосовой чат активен — нажмите T для разговора"
-  }
-  TextWidgetClass "{68F937C13DF98C61}" {
-   Name "RolesHeader"
-   Slot FrameWidgetSlot "{68F46DB5310ABA2F}" {
-    Anchor 0 0 0 0
-    OffsetLeft 645
-    OffsetTop 240
-    OffsetRight -1105
-    OffsetBottom -270
-   }
-   Color 0.9 0.9 0.5 1
-   Text "РОЛИ"
-  }
-  TextWidgetClass "{68F937C13DF9C6AC}" {
+
+  TextWidgetClass "AA00010100000001" {
    Name "PlayersHeader"
-   Slot FrameWidgetSlot "{68F46DB5310ABA32}" {
-    Anchor 0.6 0 1 0
-    OffsetLeft -5
-    OffsetTop 240
-    OffsetRight 12.91
-    OffsetBottom -270
+   Slot FrameWidgetSlot "AA00010100000002" {
+    Anchor 0 0 0.1 0
+    OffsetLeft 0
+    OffsetTop 70
+    OffsetRight -4
+    OffsetBottom -92
    }
-   Color 0.9 0.9 0.5 1
-   Text "ИГРОКИ В ЛОББИ"
+   Color 0.78 0.68 0.42 1
+   Text "ИГРОКИ"
+   "Font Size" 15
   }
-  FrameWidgetClass "{68F937C13DF80438}" {
-   Name "RoleListContainer"
-   Slot FrameWidgetSlot "{68F46DB5310ABAC7}" {
-    Anchor 0 0 0.55 1
-    OffsetLeft 640
-    OffsetTop 265
-    OffsetRight -15
-    OffsetBottom 120
+  TextWidgetClass "AA00010100000003" {
+   Name "RolesHeader"
+   Slot FrameWidgetSlot "AA00010100000004" {
+    Anchor 0.1 0 0.4 0
+    OffsetLeft 2
+    OffsetTop 70
+    OffsetRight -4
+    OffsetBottom -92
    }
-   Color 0 0 0 0
-   {
-    ImageWidgetClass "{IMG1BG}" {
-     Name "RolePanelBackground"
-     Slot FrameWidgetSlot "{IMG1SLOT}" {
-      Anchor 0 0 1 1
-      OffsetLeft 0
-      OffsetTop 0
-      OffsetRight 0
-      OffsetBottom 0
-     }
-     Color 0.12 0.12 0.12 0.85
-    }
-    ScrollLayoutWidgetClass "{A1B2C3D4E5F60001}" {
-     Name "RoleScroll"
-     Slot FrameWidgetSlot "{A1B2C3D4E5F60002}" {
-      Anchor 0 0 1 1
-      OffsetLeft 10
-      OffsetTop 10
-      OffsetRight 0
-      OffsetBottom -10
-     }
-     {
-      VerticalLayoutWidgetClass "{6908FA429BA60B05}" {
-       Name "RoleVBox"
-       Slot FrameWidgetSlot "{6908FA429BA60B10}" {
-        Anchor 0 0 1 1
-        OffsetLeft 0
-        OffsetTop 0
-        OffsetRight 0
-        OffsetBottom 0
-       }
-      }
-     }
-    }
-   }
+   Color 0.78 0.68 0.42 1
+   Text "ОТРЯДЫ И РОЛИ"
+   "Font Size" 15
   }
-  FrameWidgetClass "{68F937C13DF80439}" {
+
+  FrameWidgetClass "AA00010200000001" {
    Name "PlayerListContainer"
-   Slot FrameWidgetSlot "{68F46DB5310ABAD5}" {
-    Anchor 0.6 0 1 1
-    OffsetLeft -5
-    OffsetTop 265
-    OffsetRight 12.91
-    OffsetBottom 120
+   Slot FrameWidgetSlot "AA00010200000002" {
+    Anchor 0 0 0.1 1
+    OffsetLeft 0
+    OffsetTop 94
+    OffsetRight -3
+    OffsetBottom -150
    }
    Color 0 0 0 0
    {
-    ImageWidgetClass "{IMG2BG}" {
-     Name "PlayerPanelBackground"
-     Slot FrameWidgetSlot "{IMG2SLOT}" {
+    FrameWidgetClass "AA00010200000009" {
+     Name "PlayerPanelBorder"
+     Slot FrameWidgetSlot "AA0001020000000A" {
       Anchor 0 0 1 1
       OffsetLeft 0
       OffsetTop 0
       OffsetRight 0
       OffsetBottom 0
      }
-     Color 0.12 0.12 0.12 0.85
+     Color 0.8 0.62 0.3 0.12
     }
-    ScrollLayoutWidgetClass "{B1B2C3D4E5F60001}" {
-     Name "PlayerScroll"
-     Slot FrameWidgetSlot "{B1B2C3D4E5F60002}" {
+    ImageWidgetClass "AA00010200000003" {
+     Name "PlayerPanelBackground"
+     Slot FrameWidgetSlot "AA00010200000004" {
       Anchor 0 0 1 1
-      OffsetLeft 10
-      OffsetTop 10
+      OffsetLeft 1
+      OffsetTop 1
+      OffsetRight -1
+      OffsetBottom -1
+     }
+     Color 0.048 0.054 0.06 1
+    }
+    ScrollLayoutWidgetClass "AA00010200000005" {
+     Name "PlayerScroll"
+     Slot FrameWidgetSlot "AA00010200000006" {
+      Anchor 0 0 1 1
+      OffsetLeft 4
+      OffsetTop 4
       OffsetRight 0
-      OffsetBottom -10
+      OffsetBottom -4
      }
      {
-      VerticalLayoutWidgetClass "{6908FA429BA60BC2}" {
+      VerticalLayoutWidgetClass "AA00010200000007" {
        Name "PlayerVBox"
-       Slot FrameWidgetSlot "{6908FA429BA60BC5}" {
+       Slot FrameWidgetSlot "AA00010200000008" {
         Anchor 0 0 1 1
-        PositionX 0
         OffsetLeft 0
-        PositionY 0
         OffsetTop 0
-        SizeX 0
         OffsetRight 0
-        SizeY 0
         OffsetBottom 0
        }
       }
@@ -181,41 +205,276 @@ FrameWidgetClass {
     }
    }
   }
-  TextWidgetClass "{68F937C13DF80A97}" {
-   Name "GMHint"
-   Slot FrameWidgetSlot "{68F46DB5310ABAA9}" {
-    Anchor 0.25 1 0.75 1
-    OffsetLeft 0
-    OffsetTop -115
-    OffsetRight 0
-    OffsetBottom -90
+
+  FrameWidgetClass "AA00010300000001" {
+   Name "RoleListContainer"
+   Slot FrameWidgetSlot "AA00010300000002" {
+    Anchor 0.1 0 0.4 1
+    OffsetLeft 2
+    OffsetTop 94
+    OffsetRight -4
+    OffsetBottom -150
    }
-   Color 0.55 0.85 0.55 1
-   Text "Только GameMaster может начать игру"
-  }
-  ButtonWidgetClass "{68F46DB5310ABAE5}" {
-   Name "StartGameButton"
-   Slot FrameWidgetSlot "{68F46DB5310ABAF3}" {
-    Anchor 0.25 1 0.75 1
-    OffsetLeft 0
-    OffsetTop -85
-    OffsetRight 0
-    OffsetBottom -15
-   }
-   Color 0.08 0.65 0.08 1
+   Color 0 0 0 0
    {
-    TextWidgetClass "{68F46DB5310ABA8C}" {
-     Name "StartGameText"
-     Slot ButtonWidgetSlot "{68F46DB5310ABA9A}" {
+    FrameWidgetClass "AA00010300000009" {
+     Name "RolePanelBorder"
+     Slot FrameWidgetSlot "AA0001030000000A" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
      }
-     Color 1 1 1 1
-     Text ">>> НАЧАТЬ ИГРУ (Enter) <<<"
+     Color 0.8 0.62 0.3 0.12
+    }
+    ImageWidgetClass "AA00010300000003" {
+     Name "RolePanelBackground"
+     Slot FrameWidgetSlot "AA00010300000004" {
+      Anchor 0 0 1 1
+      OffsetLeft 1
+      OffsetTop 1
+      OffsetRight -1
+      OffsetBottom -1
+     }
+     Color 0.048 0.054 0.06 1
+    }
+    ImageWidgetClass "AA0001030000000B" {
+     Name "RolePanelAccent"
+     Slot FrameWidgetSlot "AA0001030000000C" {
+      Anchor 0.7 0 0.7 1
+      OffsetLeft 0
+      OffsetTop 8
+      OffsetRight 1
+      OffsetBottom -8
+     }
+     Color 0.8 0.62 0.3 0.1
+    }
+    ScrollLayoutWidgetClass "AA00010300000005" {
+     Name "RoleScroll"
+     Slot FrameWidgetSlot "AA00010300000006" {
+      Anchor 0 0 1 1
+      OffsetLeft 10
+      OffsetTop 10
+      OffsetRight 0
+      OffsetBottom -10
+     }
+     {
+      VerticalLayoutWidgetClass "AA00010300000007" {
+       Name "RoleVBox"
+       Slot FrameWidgetSlot "AA00010300000008" {
+        Anchor 0 0 1 1
+        OffsetLeft 0
+        OffsetTop 0
+        OffsetRight 0
+        OffsetBottom 0
+       }
+      }
+     }
     }
    }
   }
-  FrameWidgetClass "{690483026FEC4436}" {
+
+  FrameWidgetClass "AA00010900000001" {
+   Name "MapPanel"
+   Slot FrameWidgetSlot "AA00010900000002" {
+    Anchor 0.45 0 1 1
+    OffsetLeft 10
+    OffsetTop 94
+    OffsetRight -14
+    OffsetBottom -185
+   }
+   Color 0 0 0 0
+   {
+    FrameWidgetClass "AA00010900000003" {
+     Name "MapPanelBorder"
+     Slot FrameWidgetSlot "AA00010900000004" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.8 0.62 0.3 0.14
+    }
+    ButtonWidgetClass "AA0001090000000D" {
+     Name "OpenMapButton"
+     Slot FrameWidgetSlot "AA0001090000000E" {
+      Anchor 0.08 0.25 0.92 0.55
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.045 0.052 0.058 1
+     {
+      TextWidgetClass "AA0001090000000F" {
+       Name "OpenMapText"
+       Slot ButtonWidgetSlot "AA00010900000010" {
+       }
+       Color 0.9 0.76 0.45 1
+       Text "ОТКРЫТЬ КАРТУ (M)"
+       "Font Size" 28
+       "Horizontal Alignment" Center
+       "Vertical Alignment" Center
+      }
+     }
+    }
+    TextWidgetClass "AA00010900000015" {
+     Name "MapOpenHint"
+     Slot FrameWidgetSlot "AA00010900000016" {
+      Anchor 0.08 0.6 0.92 0.75
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.55 0.58 0.54 1
+     Text "В карте: колесо — масштаб, ЛКМ — панорама, ПКМ — меню маркеров"
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+   }
+  }
+
+  FrameWidgetClass "AA00010400000001" : "{0651202E9F2646DE}UI/layouts/Map/Map.layout" {
+   Name "MapFrame"
+   Slot FrameWidgetSlot "AA00010400000002" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   Clipping True
+   {
+    FrameWidgetClass "AA0001040000000D" {
+     Name "MapFrame"
+     Slot FrameWidgetSlot "AA0001040000000E" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Clipping False
+    }
+    ImageWidgetClass "AA00010400000009" {
+     Name "DisableCursorLines"
+     Slot FrameWidgetSlot "AA0001040000000C" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     "Is Visible" 0
+    }
+    FrameWidgetClass "AA0001040000000A" : "{2F8AEE78FF5A8104}UI/layouts/Map/ToolMenu.layout" {
+     Name "ToolMenu"
+     Slot FrameWidgetSlot "AA0001040000000B" {
+      Anchor 0 0 1 0
+      OffsetLeft 0
+      OffsetTop 70
+      OffsetRight 0
+      OffsetBottom -100
+     }
+    }
+   }
+  }
+
+  ButtonWidgetClass "AA00010900000011" {
+   Name "BackToLobbyButton"
+   Slot FrameWidgetSlot "AA00010900000012" {
+    Anchor 0.6 0 0.99 0
+    OffsetLeft 0
+    OffsetTop 74
+    OffsetRight 0
+    OffsetBottom 108
+   }
+   "Is Visible" 0
+   Color 0.045 0.052 0.058 1
+   {
+    TextWidgetClass "AA00010900000013" {
+     Name "BackToLobbyText"
+     Slot ButtonWidgetSlot "AA00010900000014" {
+     }
+     Color 0.9 0.76 0.45 1
+     Text "ВЕРНУТЬСЯ В ЛОББИ (Esc)"
+     "Font Size" 15
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+   }
+  }
+
+  TextWidgetClass "AA00010500000001" {
+   Name "MapHint"
+    Slot FrameWidgetSlot "AA00010500000002" {
+     Anchor 0.4 1 1 1
+     OffsetLeft 20
+     OffsetTop -178
+     OffsetRight 0
+     OffsetBottom -162
+    }
+    Color 0.82 0.72 0.52 0.9
+    Text "M — открыть карту. Колесо — масштаб, ЛКМ — панорама, ПКМ — маркеры"
+   "Font Size" 14
+  }
+  TextWidgetClass "AA00010500000003" {
+   Name "VoiceChatHint"
+    Slot FrameWidgetSlot "AA00010500000004" {
+     Anchor 0.75 1 1 1
+     OffsetLeft 8
+     OffsetTop -178
+     OffsetRight -12
+     OffsetBottom -162
+    }
+   Color 0.45 0.5 0.46 0.9
+   Text "Голосовая связь: зажмите T"
+   "Font Size" 13
+   "Horizontal Alignment" Right
+  }
+
+  FrameWidgetClass "AA00010700000001" : "{D89BBA18F99053D6}UI/layouts/HUD/Chat/ChatHud.layout" {
+   Name "Chat"
+   Slot FrameWidgetSlot "AA00010700000002" {
+    Anchor 0 1 1 1
+    OffsetLeft 0
+    OffsetTop -600
+    OffsetRight 0
+    OffsetBottom 0
+   }
+  }
+
+  ButtonWidgetClass "AA00010700000010" {
+   Name "ChatOpenButton"
+   Slot FrameWidgetSlot "AA00010700000011" {
+    Anchor 0 0 0.3 0
+    OffsetLeft 8
+    OffsetTop 80
+    OffsetRight -8
+    OffsetBottom 106
+   }
+   "Z Order" 5
+   Color 0.045 0.05 0.055 0.9
+   {
+    TextWidgetClass "AA00010700000012" {
+     Name "ChatOpenButtonText"
+     Slot ButtonWidgetSlot "AA00010700000013" {
+     }
+     Color 0.66 0.66 0.6 1
+     Text "ОТКРЫТЬ ЧАТ (Enter)"
+     "Font Size" 13
+     "Horizontal Alignment" Center
+    }
+   }
+  }
+
+  FrameWidgetClass "690483026FEC4436" {
    Name "HudManagerLayout"
-   Slot FrameWidgetSlot "{5F0B1576FB3E03F4}" {
+   Slot FrameWidgetSlot "5F0B1576FB3E03F4" {
     Anchor 0 0 1 1
     OffsetLeft 0
     OffsetTop 0
@@ -224,14 +483,14 @@ FrameWidgetClass {
    }
    "Z Order" 11
    components {
-    SCR_HUDMenuComponent "{5F0ADEF0C660AF98}" {
+    SCR_HUDMenuComponent "5F0ADEF0C660AF98" {
      m_sIdentifier "EndScreenMenu"
     }
    }
    {
-    FrameWidgetClass "{690483026FEC5441}" {
+    FrameWidgetClass "690483026FEC5441" {
      Name "Layer_Slots"
-     Slot FrameWidgetSlot "{5D62A913A6057240}" {
+     Slot FrameWidgetSlot "5D62A913A6057240" {
       Anchor 0 0 1 1
       OffsetLeft 0
       OffsetTop 0
@@ -239,35 +498,34 @@ FrameWidgetClass {
       OffsetBottom 0
      }
      {
-      VerticalLayoutWidgetClass "{690483026FEC5443}" {
+      VerticalLayoutWidgetClass "690483026FEC5443" {
        Name "Group_Left"
-       Slot FrameWidgetSlot "{5D44B19A2BE9A6C4}" {
+       Slot FrameWidgetSlot "5D44B19A2BE9A6C4" {
         Anchor 0 0 0 1
         OffsetLeft 0
         OffsetTop 0
         OffsetRight 600
         OffsetBottom 0
        }
-       Clipping False
        components {
-        SCR_HUDGroupUIComponent "{5D44B19A39A468D7}" {
+        SCR_HUDGroupUIComponent "5D44B19A39A468D7" {
          m_bEnableDebugFont 0
         }
        }
        {
-        FrameWidgetClass "{690483026FEFA122}" {
+        FrameWidgetClass "690483026FEFA122" {
          Name "Filler0"
-         Slot LayoutSlot "{5D44B19A48E6BC77}" {
+         Slot LayoutSlot "5D44B19A48E6BC77" {
           SizeMode Fill
           FillWeight 0.3
          }
         }
-        FrameWidgetClass "{690483026FEFA123}" {
+        FrameWidgetClass "690483026FEFA123" {
          Name "Slot_Chat"
-         Slot LayoutSlot "{5D44B19A05C7B70A}" {
+         Slot LayoutSlot "5D44B19A05C7B70A" {
          }
          components {
-          SCR_HUDSlotUIComponent "{5D44B19A037B2FF4}" {
+          SCR_HUDSlotUIComponent "5D44B19A037B2FF4" {
            m_iPriority 1
            m_aHeightSteps {
             100 200 300
@@ -278,12 +536,12 @@ FrameWidgetClass {
           }
          }
         }
-        FrameWidgetClass "{690483026FEFF90E}" {
+        FrameWidgetClass "690483026FEFF90E" {
          Name "Slot_VON"
-         Slot LayoutSlot "{5D44B19A05C7B70F}" {
+         Slot LayoutSlot "5D44B19A05C7B70F" {
          }
          components {
-          SCR_HUDSlotUIComponent "{5D44B19A037B2FF9}" {
+          SCR_HUDSlotUIComponent "5D44B19A037B2FF9" {
            m_iPriority 1
            m_aHeightSteps {
             100 200
@@ -294,12 +552,75 @@ FrameWidgetClass {
           }
          }
         }
-        FrameWidgetClass "{690483026FEFF9F1}" {
+FrameWidgetClass "690483026FEFF9F1" {
          Name "Filler"
-         Slot LayoutSlot "{5D44B19A48E6BC78}" {
+         Slot LayoutSlot "5D44B19A48E6BC78" {
           SizeMode Fill
          }
         }
+}
+       }
+      }
+     }
+    }
+   }
+   FrameWidgetClass "AA00010800000001" {
+    Name "BottomStrip"
+   Slot FrameWidgetSlot "AA00010800000002" {
+    Anchor 0 1 1 1
+    OffsetLeft 0
+    OffsetTop -150
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   Color 0 0 0 0
+   {
+    ImageWidgetClass "AA00010800000030" {
+     Name "BottomStripBackground"
+     Slot FrameWidgetSlot "AA00010800000031" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.03 0.034 0.038 1
+    }
+    ImageWidgetClass "AA00010800000032" {
+     Name "BottomStripAccent"
+     Slot FrameWidgetSlot "AA00010800000033" {
+      Anchor 0 0 1 0
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom -2
+     }
+     Color 0.8 0.62 0.3 0.55
+    }
+     FrameWidgetClass "AA00010800000020" {
+      Name "MissionDescriptionFrame"
+      Slot FrameWidgetSlot "AA00010800000021" {
+       Anchor 0.02 1 0.4 1
+       OffsetLeft 0
+       OffsetTop -142
+       OffsetRight -8
+       OffsetBottom -6
+      }
+      Color 0.04 0.045 0.05 1
+      {
+       TextWidgetClass "AA00010800000003" {
+        Name "MissionDescription"
+        Slot FrameWidgetSlot "AA00010800000004" {
+         Anchor 0 0 1 1
+         OffsetLeft 12
+         OffsetTop 4
+         OffsetRight -12
+         OffsetBottom -4
+        }
+        Color 0.62 0.62 0.58 1
+        Text "ОПИСАНИЕ МИССИИ"
+        "Font Size" 15
+        "Vertical Alignment" Center
        }
       }
      }
@@ -307,4 +628,3 @@ FrameWidgetClass {
    }
   }
  }
-}

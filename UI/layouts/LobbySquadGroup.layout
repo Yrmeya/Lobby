@@ -3,13 +3,26 @@ VerticalLayoutWidgetClass {
  Slot FrameWidgetSlot {
   Anchor 0 0 1 1
  }
- Color 0.08 0.08 0.08 0.95
+ Color 0.045 0.05 0.055 0.9
  {
   TextWidgetClass {
    Name "SquadName"
    Text ""
    Color 1 1 1 1
    Slot LayoutSlot {}
+   "Font Size" 17
+   "Vertical Alignment" Center
+  }
+  ImageWidgetClass {
+   Name "SquadAccent"
+   Slot FrameWidgetSlot {
+    Anchor 0 0 1 0
+    OffsetLeft 0
+    OffsetTop 22
+    OffsetRight 0
+    OffsetBottom -1
+   }
+   Color 0.8 0.62 0.3 0.3
   }
   VerticalLayoutWidgetClass {
    Name "RoleList"

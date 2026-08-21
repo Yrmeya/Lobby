@@ -446,7 +446,11 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
 
         m_mSpectators.Set(playerId, entity);
         LobbyPlayerData data = m_mPlayers.Get(playerId);
-        if (data) data.m_CharacterEntity = entity;
+        if (data)
+        {
+            data.m_CharacterEntity = entity;
+            data.m_bIsCivSpectator = true;
+        }
 
         PlayerController pcSpec = GetGame().GetPlayerManager().GetPlayerController(playerId);
         if (pcSpec)
@@ -618,6 +622,186 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         if (Replication.IsServer()) Print("[LobbyMgr] Server init.");
     }
 
+    // =====================================================================
+    // #spawnciv: возрождение всех погибших за основную игровую фракцию
+    // =====================================================================
+    void SV_SpawnAllDeadPlayers()
+    {
+        if (!Replication.IsServer()) return;
+
+        // Погибшие отслеживаются в двух местах: LobbyManager (EOnFrame) и
+        // LobbyDeathSpectatorComponent (таймер 500 мс - основной источник).
+        // Объединяем оба списка, чтобы #spawnciv находил всех мёртвых.
+        ref set<int> deadSet = new set<int>();
+        foreach (int pid : m_aDeadPlayers)
+            deadSet.Insert(pid);
+
+        LobbyDeathSpectatorComponent deathSpec = LobbyDeathSpectatorComponent.GetInstance();
+        if (deathSpec)
+        {
+            foreach (int pid : deathSpec.GetDeadPlayerIds())
+                deadSet.Insert(pid);
+        }
+
+        if (deadSet.IsEmpty())
+        {
+            Print("[LobbyMgr] #spawnciv: no dead players.");
+            return;
+        }
+
+        // Собираем все роли основной игровой фракции (не CIV): фракции ролей
+        // задаются создателем миссии в LobbyRoleConfig. Если у роли фракция
+        // не указана - берём фракцию игроков из настроек лобби (m_sPlayerFactionKey).
+        ref array<ref LobbyRoleConfig> availableRoles = {};
+        foreach (LobbySquadConfig squad : m_aSquads)
+        {
+            array<ref LobbyRoleConfig> roles = squad.GetRoles();
+            foreach (LobbyRoleConfig role : roles)
+            {
+                string factionKey = GetEffectiveRoleFaction(role);
+                if (factionKey == "" || factionKey == "CIV")
+                    continue;
+                availableRoles.Insert(role);
+            }
+        }
+
+        if (availableRoles.IsEmpty())
+        {
+            Print("[LobbyMgr] #spawnciv: no non-CIV roles configured!", LogLevel.WARNING);
+            return;
+        }
+
+        Print("[LobbyMgr] #spawnciv: respawning " + deadSet.Count() + " player(s) with random roles...");
+
+        foreach (int pid : deadSet)
+        {
+            LobbyPlayerData data = m_mPlayers.Get(pid);
+            if (!data) continue;
+
+            // Отключённых игроков не трогаем - спавним только подключённых.
+            PlayerController pc = GetGame().GetPlayerManager().GetPlayerController(pid);
+            if (!pc) continue;
+
+            // Старый персонаж (тело погибшего или CIV-дрон) - удалим после вселения
+            IEntity oldCharacter = data.m_CharacterEntity;
+
+            // Случайная роль из доступных
+            int roleIdx = Math.RandomInt(0, availableRoles.Count());
+            LobbyRoleConfig role = availableRoles.Get(roleIdx);
+            IEntity character = SpawnCharacterFromRole(pid, data, role);
+            if (!character)
+            {
+                Print("[LobbyMgr] #spawnciv: failed to spawn character for player " + pid, LogLevel.WARNING);
+                continue;
+            }
+
+            // Отключаем AI и отдаём контроль игроку (как при обычном старте игры)
+            AIControlComponent aiControl = AIControlComponent.Cast(character.FindComponent(AIControlComponent));
+            if (aiControl)
+                aiControl.DeactivateAI();
+
+            RplComponent rpl = RplComponent.Cast(character.FindComponent(RplComponent));
+            if (rpl) rpl.GiveExt(pc.GetRplIdentity(), false);
+            pc.SetControlledEntity(character);
+
+            // Обновляем фракцию игрока (PlayerController), а не только персонажа,
+            // иначе на радаре/в HUD игрок останется CIV.
+            string factionKey = GetEffectiveRoleFaction(role);
+            SCR_FactionManager facMgr = SCR_FactionManager.Cast(GetGame().GetFactionManager());
+            if (facMgr && factionKey != "")
+            {
+                Faction faction = facMgr.GetFactionByKey(factionKey);
+                if (faction)
+                {
+                    SCR_PlayerFactionAffiliationComponent playerFacComp = SCR_PlayerFactionAffiliationComponent.Cast(pc.FindComponent(SCR_PlayerFactionAffiliationComponent));
+                    if (playerFacComp)
+                    {
+                        playerFacComp.SetAffiliatedFaction(faction);
+                        facMgr.UpdatePlayerFaction_S(playerFacComp);
+                    }
+                }
+            }
+
+            // Возвращаем клиенту камеру персонажа (убираем призрачную камеру смерти)
+            LobbyRPCComponent rpc = LobbyRPCComponent.GetInstance();
+            if (rpc) rpc.BroadcastRespawnPlayer(pid);
+
+            // Убираем болванчика смерти, CIV-болванчик в космосе и старый персонаж
+            IEntity dummy = m_mSpectators.Get(pid);
+            if (dummy)
+                SCR_EntityHelper.DeleteEntityAndChildren(dummy);
+            m_mSpectators.Remove(pid);
+
+            // Убираем CIV-болванчик в космосе и список мёртвых в LobbyDeathSpectator,
+            // иначе игрок останется "мёртвым" навсегда и следующая смерть не отследится.
+            if (deathSpec)
+                deathSpec.NotifyPlayerRespawned(pid);
+
+            // Старый CIV-персонаж (тело погибшего) после вселения умирает/удаляется
+            if (oldCharacter)
+                SCR_EntityHelper.DeleteEntityAndChildren(oldCharacter);
+
+            PlayerDeathGhost.RevivePlayer(pid);
+            data.m_bIsCivSpectator = false;
+        }
+
+        m_aDeadPlayers.Clear();
+    }
+
+    //------------------------------------------------------------------------------------------------
+    //! Спавн персонажа по роли из конфига (префаб + фракция роли).
+    protected IEntity SpawnCharacterFromRole(int playerId, LobbyPlayerData data, LobbyRoleConfig role)
+    {
+        ResourceName prefab = role.m_sCharacterPrefab;
+        if (prefab == "") return null;
+
+        Resource res = Resource.Load(prefab);
+        if (!res || !res.IsValid()) return null;
+
+        int squadIdx = 0;
+        if (data.m_iSquadIndex >= 0)
+            squadIdx = data.m_iSquadIndex;
+        vector spawnPos = GetSpawnPosition(squadIdx);
+        vector spawnMat[4];
+        Math3D.MatrixIdentity4(spawnMat);
+        spawnMat[3] = spawnPos;
+
+        EntitySpawnParams params = new EntitySpawnParams();
+        params.TransformMode = ETransformMode.WORLD;
+        params.Transform = spawnMat;
+
+        IEntity character = GetGame().SpawnEntityPrefab(res, GetGame().GetWorld(), params);
+        if (!character) return null;
+
+        data.m_CharacterEntity = character;
+
+        // Фракция из конфига роли (с фолбэком на фракцию игроков из настроек лобби)
+        string factionKey = GetEffectiveRoleFaction(role);
+        SCR_FactionManager facMgr = SCR_FactionManager.Cast(GetGame().GetFactionManager());
+        if (facMgr && factionKey != "")
+        {
+            Faction faction = facMgr.GetFactionByKey(factionKey);
+            if (faction)
+            {
+                FactionAffiliationComponent facComp = FactionAffiliationComponent.Cast(character.FindComponent(FactionAffiliationComponent));
+                if (facComp) facComp.SetAffiliatedFaction(faction);
+            }
+        }
+
+        return character;
+    }
+
+    //------------------------------------------------------------------------------------------------
+    //! Эффективная фракция роли: явный m_sFactionKey, либо фракция игроков
+    //! из настроек лобби (m_sPlayerFactionKey), если у роли фракция не задана.
+    protected string GetEffectiveRoleFaction(LobbyRoleConfig role)
+    {
+        if (role.m_sFactionKey != "")
+            return role.m_sFactionKey;
+        return m_sPlayerFactionKey;
+    }
+    // =====================================================================
+
     override void OnPlayerConnected(int playerId)
     {
         super.OnPlayerConnected(playerId);
@@ -626,15 +810,28 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
         if (!m_bLobbyActive) 
         {
             LobbyPlayerData data = m_mPlayers.Get(playerId);
-            
-            if (!data || !data.m_CharacterEntity)
+
+            bool isFreshJoin = !data || !data.m_CharacterEntity;
+            bool isReconnect = data && data.m_CharacterEntity && data.m_bIsCivSpectator;
+
+            if (isFreshJoin || isReconnect)
             {
                 if (!data)
                 {
                     data = new LobbyPlayerData(playerId);
                     m_mPlayers.Set(playerId, data);
                 }
-                
+                else if (isReconnect)
+                {
+                    // Старый CIV-персонаж (оставшийся в мире при дисконнекте)
+                    // удаляем - выдадим новый, как при смерти.
+                    IEntity oldChar = data.m_CharacterEntity;
+                    data.m_CharacterEntity = null;
+                    SCR_EntityHelper.DeleteEntityAndChildren(oldChar);
+                }
+
+                data.m_bIsCivSpectator = true;
+
                 // Важно: сразу добавляем в мертвые, чтобы EOnFrame не пытался "спасти" нас, если мы умрем в космосе
                 if (!m_aDeadPlayers.Contains(playerId))
                     m_aDeadPlayers.Insert(playerId);
@@ -672,12 +869,48 @@ class LobbyManagerComponent : SCR_BaseGameModeComponent
             DeleteSpectatorForPlayer(playerId);
             m_mPlayers.Remove(playerId);
         }
+        else
+        {
+            // Игра уже идёт: персонаж остаётся в мире как CIV-дрон (парит,
+            // как при смерти). При повторном подключении игрок получит новый
+            // CIV-болванчик и камеру, а #spawnciv вернёт его в игру.
+            LobbyPlayerData data = m_mPlayers.Get(playerId);
+            if (data && data.m_CharacterEntity)
+            {
+                data.m_bIsCivSpectator = true;
+                SetCharacterToCivFlying(data.m_CharacterEntity);
+            }
+        }
         
         LobbyRPCComponent rpc = LobbyRPCComponent.GetInstance();
         if (rpc) 
         { 
             rpc.BroadcastPlayerLeft(playerId); 
             rpc.BroadcastHeaderUpdate(); 
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------
+    //! Переводим персонажа в состояние CIV-дрона: фракция CIV + парение.
+    protected void SetCharacterToCivFlying(IEntity character)
+    {
+        SCR_FactionManager facMgr = SCR_FactionManager.Cast(GetGame().GetFactionManager());
+        if (facMgr)
+        {
+            Faction civFaction = facMgr.GetFactionByKey("CIV");
+            if (civFaction)
+            {
+                FactionAffiliationComponent facComp = FactionAffiliationComponent.Cast(character.FindComponent(FactionAffiliationComponent));
+                if (facComp) facComp.SetAffiliatedFaction(civFaction);
+            }
+        }
+
+        Physics phys = character.GetPhysics();
+        if (phys)
+        {
+            phys.EnableGravity(false);
+            phys.SetVelocity("0 0 0");
+            phys.SetAngularVelocity("0 0 0");
         }
     }
 

@@ -10,6 +10,7 @@ class LobbyPlayerData
 	IEntity m_SpectatorEntity;
 	IEntity m_CharacterEntity;
 	int m_iFetchRetries = 0;
+	bool m_bIsCivSpectator;	// игрок сейчас летает за CIV (JIP/дисконнект) и ждёт #spawnciv
 	
 	void LobbyPlayerData(int playerId)
 	{
@@ -21,5 +22,6 @@ class LobbyPlayerData
 		m_SpectatorEntity = null;
 		m_CharacterEntity = null;
 		m_sPlayerName   = "";
+		m_bIsCivSpectator = false;
 	}
 }

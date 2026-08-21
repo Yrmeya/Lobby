@@ -1,0 +1,39 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ Slot FrameWidgetSlot "AA0001B300000101" {
+  Anchor 0 0 0 0
+  OffsetLeft 0
+  OffsetTop 0
+  OffsetRight 0
+  OffsetBottom 0
+ }
+ "Z Order" 150
+ Clipping False
+ Color 1 1 1 1
+ {
+  TextWidgetClass "AA0001B300000103" {
+   Name "Title"
+   Slot FrameWidgetSlot "AA0001B300000104" {
+    Anchor 0.5 0.5 0.5 0.5
+    OffsetLeft 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+    Alignment 0.5 0.5
+    SizeToContent 1
+   }
+   Color 0.95 0.32 0.22 1
+   Text "X"
+   "Font Size" 20
+   "Min Font Size" 20
+   "Horizontal Alignment" Center
+   "Vertical Alignment" Center
+   FontProperties FontProperties "AA0001B300000105" {
+    OutlineSize 0
+    OutlineColor 0 0 0 1
+   }
+  }
+ }
+}

@@ -1,0 +1,48 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ Slot FrameWidgetSlot "AA0001B200000201" {
+  Anchor 0 0 0 0
+  OffsetLeft 0
+  OffsetTop 0
+  OffsetRight 0
+  OffsetBottom 0
+ }
+ "Z Order" 1000
+ Color 0.035 0.04 0.045 0.9
+ {
+  FrameWidgetClass "AA0001B200000202" {
+   Name "PanelBorder"
+   Slot FrameWidgetSlot "AA0001B200000203" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   Color 0.8 0.62 0.3 0.25
+  }
+  TextWidgetClass "AA0001B200000204" {
+   Name "PanelTitle"
+   Slot FrameWidgetSlot "AA0001B200000205" {
+    Anchor 0 0 1 0
+    OffsetLeft 10
+    OffsetTop 6
+    OffsetRight -8
+    OffsetBottom -32
+   }
+   Color 0.78 0.68 0.42 1
+   Text "ИГРОКИ"
+   "Font Size" 14
+  }
+  VerticalLayoutWidgetClass "AA0001B200000206" {
+   Name "MapPlayerVBox"
+   Slot FrameWidgetSlot "AA0001B200000207" {
+    Anchor 0 0 1 1
+    OffsetLeft 4
+    OffsetTop 36
+    OffsetRight -4
+    OffsetBottom -4
+   }
+  }
+ }
+}
